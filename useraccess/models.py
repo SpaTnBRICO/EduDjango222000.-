@@ -282,6 +282,36 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
+class Unit(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    name = models.CharField(max_length=15, unique=True, blank=True, null=True)
+    teacher = models.CharField(max_length=15, unique=True, blank=True, null=True)
+    unit_code = models.CharField(max_length=15, unique=True, blank=True, null=True)
+    created_by = models.CharField(max_length=15, unique=True, blank=True, null=True)
+    modified_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def generate_unit_code(self):
+        course_code = self.course.code.upper()
+        random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+        self.unit_code = f"{course_code}/{random_suffix}"
+
+        while Unit.objects.filter(unit_code=self.unit_code).exists():
+            random_suffix = ''.join(random.choices(string.ascii_letters + string.digits, k=5))
+            self.unit_code = f"{course_code}/{random_suffix}"
+
+    def save(self, *args, **kwargs):
+        if not self.unit_code:
+            self.generate_unit_code()
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.name}--{self.course.name}--{self.unit_code}"
+
+
+
+
 
 def default_user_instance():
     # Replace this with the logic to return a default user (e.g., the first user in the DB)
@@ -475,3 +505,22 @@ class Teacher(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} (Registration: {self.staff_number})"
+
+
+class CAT(models.Model):
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=50)
+    student = models.ForeignKey(StudentApp, on_delete=models.CASCADE, null=True, blank=True)
+    score = models.DecimalField(max_digits=50, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.student.stud.username}'s CAT (Course: {self.unit.course.name}) (Unit: {self.unit.name})"
+
+class Practical(models.Model):
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, blank=True)
+    title = models.CharField(max_length=50)
+    student = models.ForeignKey(StudentApp, on_delete=models.CASCADE, null=True, blank=True)
+    score = models.DecimalField(max_digits=50, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.student.stud.username}'s Practical (Course: {self.unit.course.name}) (Unit: {self.unit.name})"

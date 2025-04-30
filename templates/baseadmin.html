@@ -58,7 +58,7 @@
           </ul>
         </div>
         <ul class="navbar-nav navbar-right">
-          {% if request.user.is_authenticated %}
+          {% if request.user.is_admin %}
           <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown"
               class="nav-link nav-link-lg message-toggle"><i data-feather="mail"></i>
               {% if texts %}
