@@ -1,0 +1,33 @@
+<!-- templates/student/update_bio.html -->
+<form method="POST">
+    {% csrf_token %}
+    <label for="date_of_birth">Date of Birth:</label>
+    <input type="date" name="date_of_birth" value="{{ bio_data.date_of_birth }}" required><br><br>
+
+    <label for="gender">Gender:</label>
+    <select name="gender">
+        <option value="Male" {% if bio_data.gender == "Male" %}selected{% endif %}>Male</option>
+        <option value="Female" {% if bio_data.gender == "Female" %}selected{% endif %}>Female</option>
+        <option value="Other" {% if bio_data.gender == "Other" %}selected{% endif %}>Other</option>
+    </select><br><br>
+
+    <label for="address">Address:</label>
+    <textarea name="address" required>{{ bio_data.address }}</textarea><br><br>
+
+    <label for="nationality">Nationality:</label>
+    <input type="text" name="nationality" value="{{ bio_data.nationality }}"><br><br>
+
+    <label for="emergency_contact_name">Emergency Contact Name:</label>
+    <input type="text" name="emergency_contact_name" value="{{ bio_data.emergency_contact_name }}"><br><br>
+
+    <label for="emergency_contact_phone">Emergency Contact Phone:</label>
+    <input type="text" name="emergency_contact_phone" value="{{ bio_data.emergency_contact_phone }}"><br><br>
+
+    <label for="blood_group">Blood Group:</label>
+    <input type="text" name="blood_group" value="{{ bio_data.blood_group }}"><br><br>
+
+    <label for="hobbies">Hobbies:</label>
+    <textarea name="hobbies">{{ bio_data.hobbies }}</textarea><br><br>
+
+    <button type="submit">Update Bio Data</button>
+</form>

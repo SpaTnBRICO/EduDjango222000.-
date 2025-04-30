@@ -1,0 +1,48 @@
+{% extends '../baseadmin.html' %}
+{% load static %}
+{% block content %}
+<section class="section">
+    <div class="section-body">
+        <div class="container mt-5">
+            <h1 class="mb-4">Create Quiz</h1>
+        
+            <div class="form-container">
+                <form method="post" action="{% url 'create_quiz' %}">
+                    {% csrf_token %}
+        
+                    <!-- Quiz Title Input -->
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Quiz Title</label>
+                        <input type="text" id="title" name="title" class="form-control" required>
+                    </div>
+        
+                    <!-- Course Select Input -->
+                    <div class="mb-3">
+                        <label for="course" class="form-label">Course</label>
+                        <select id="course" name="course" class="form-select" required>
+                            {% for course in courses %}
+                                <option value="{{ course.id }}">{{ course.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+        
+                    <!-- Exam Checkbox -->
+                    <div class="form-check mb-3">
+                        <input type="checkbox" id="is_exam" name="is_exam" class="form-check-input">
+                        <label class="form-check-label" for="is_exam">Is this an exam?</label>
+                    </div>
+        
+                    <!-- Submit Button -->
+                    <button type="submit" class="btn btn-primary">Create Quiz</button>
+                </form>
+        
+                <!-- Quiz List Button -->
+                <a class="btn btn-secondary mt-4" href="{% url 'quiz_list' %}">Go To Quiz List</a>
+            </div>
+        </div>
+        
+    </div>
+  </section>
+  
+
+{% endblock content %}

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KMET Technical and Vocational Training College Admission</title>
+    <style>
+        body {
+            font-family: "Times New Roman", serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        .letter-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            color: #005f6b;
+            margin-bottom: 40px;
+        }
+
+        p {
+            margin: 20px 0;
+        }
+
+        .date {
+            text-align: right;
+            margin-bottom: 30px;
+        }
+
+        .recipient {
+            margin-bottom: 30px;
+        }
+
+        .signature {
+            margin-top: 50px;
+            font-style: italic;
+            text-align: left;
+        }
+
+        .important {
+            font-weight: bold;
+            color: #e74c3c;
+        }
+
+        input[type="text"],
+        input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .section-heading {
+            font-size: 1.2em;
+            color: #005f6b;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 0.9em;
+            color: #555;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        button {
+            background-color: #005f6b;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        button:hover {
+            background-color: #003f47;
+        }
+    </style>
+</head>
+<body>
+    <div class="letter-container">
+        {% for message in messages %}
+          <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+            <strong>{{ message }}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+        <a href="{% url 'admin_dashboard' %}" >Go To Dashboard</a>
+        <form action="{% url 'confirm_letter' %}" method="POST">
+            {% csrf_token %}
+
+            <div class="recipient">
+                <p>Dear <input type="text" name="name" placeholder="Enter name" value="{{user.username}}" required readonly></p>
+            </div>
+
+            <p>The administration and Board of Directors of KMET Technical and Vocational Training College congratulate you for having met the requirements for training as outlined by the Ministry of Education, Science and Technology, in accordance with the TVET KNEC & NITA regulations. You have been admitted as a trainee in <input type="text" name="course_name" placeholder="Enter Course Name" required> at <input type="text" name="level" placeholder="Enter Level" required> level for a period of <input type="text" name="period" placeholder="Number of terms" required> terms.</p>
+
+            <p>You are required to report to the institution on <input type="date" name="reporting_date" required>. Kindly bring the following documents as part of the admission process:</p>
+            <ul>
+                <li>Registration fee payment confirmation</li>
+                <li>Copy of your KCPE/KCSE certificate</li>
+                <li>Copy of your ID/Birth certificate</li>
+                <li>Two recent passport size photos</li>
+            </ul>
+
+            <div class="section-heading">PAYMENT DETAILS</div>
+            <p class="important">ALL FEES MUST BE DEPOSITED INTO THE FOLLOWING ACCOUNT:</p>
+            <p><strong>Account Name: KMET VOCATIONAL TRAINING CENTRE</strong></p>
+            <p><strong>Bank: Kenya Commercial Bank</strong></p>
+            <p><strong>Branch: Kisumu United Mall</strong></p>
+            <p><strong>Account No: 1260687961</strong></p>
+            <p>Note: Personal cheques are NOT accepted. Fees once paid are non-refundable.</p>
+
+            <div class="section-heading">LIPA NA MPESA</div>
+            <p><strong>Paybill Number: 4073079</strong></p>
+            <p><strong>Account Name: Student's Name</strong></p>
+
+            <div class="section-heading">CONTACT INFORMATION</div>
+            <p>If you need more information, feel free to contact us at:</p>
+            <p><strong>SCHOOL:</strong> 0711659371</p>
+            <p><strong>PRINCIPAL:</strong> 0719364388</p>
+
+            <p>See the attached fee structure for more details.</p>
+
+            <h3>ACCOMMODATION</h3>
+            <p>Private hostels are available at an average rate of Kshs 3500 per month, under different management.</p>
+
+            <div class="signature">
+                <p>Yours sincerely,</p>
+                <p><strong>Principal</strong><br>KMET Technical and Vocational Training College</p>
+            </div>
+
+            <div class="footer">
+                <button type="submit">Submit Form</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        // Ensure date format is YYYY-MM-DD before form submission
+        document.querySelector('form').addEventListener('submit', function(event) {
+            var dateInput = document.querySelector('input[name="reporting_date"]');
+            var dateValue = dateInput.value;
+
+            if (dateValue) {
+                var date = new Date(dateValue);
+                // Format date to YYYY-MM-DD
+                var formattedDate = date.getFullYear() + '-' + 
+                                    ('0' + (date.getMonth() + 1)).slice(-2) + '-' + 
+                                    ('0' + date.getDate()).slice(-2);
+                dateInput.value = formattedDate;
+            }
+        });
+    </script>
+</body>
+</html>

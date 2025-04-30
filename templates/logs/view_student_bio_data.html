@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio Data</title>
+</head>
+<body>
+    <h1>Student Bio Data</h1>
+
+    <ul>
+        <li><strong>Name:</strong> {{ bio_data.student.first_name }} {{ bio_data.student.last_name }}</li>
+        <li><strong>Date of Birth:</strong> {{ bio_data.date_of_birth }}</li>
+        <li><strong>Gender:</strong> {{ bio_data.get_gender_display }}</li>
+        <li><strong>Address:</strong> {{ bio_data.address }}</li>
+        <li><strong>Nationality:</strong> {{ bio_data.nationality }}</li>
+        <li><strong>Emergency Contact Name:</strong> {{ bio_data.emergency_contact_name }}</li>
+        <li><strong>Emergency Contact Phone:</strong> {{ bio_data.emergency_contact_phone }}</li>
+        <li><strong>Blood Group:</strong> {{ bio_data.blood_group }}</li>
+        <li><strong>Hobbies:</strong> {{ bio_data.hobbies }}</li>
+    </ul>
+
+    <a href="{% url 'student:update_bio' %}">Edit Bio Data</a>
+</body>
+</html>

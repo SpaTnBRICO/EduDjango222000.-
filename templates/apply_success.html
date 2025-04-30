@@ -1,0 +1,41 @@
+{% extends 'logs/baseg.html' %}
+{% load static %}
+{% block content %}
+ <!-- Content -->
+ <div class="page-content bg-white">
+    <!-- inner page banner -->
+
+    <!-- inner page banner -->
+    <div class="page-banner contact-page section-sp2">
+        {% if request.user.is_admin %}
+        <div class="container">
+            <div class="row">
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Congratulations!</h4>
+                        <p>User has been created successfully! Login details has been sent to their email and whatsapp.</p>
+                        <hr>
+                        <a href="/" class="btn btn-primary mt-3">Go to Home Page</a>
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-primary mt-3">Go back to dashboard</a>
+                    </div>
+
+            </div>
+        </div>
+        {% else %}
+        <div class="container">
+            <div class="row">
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">Congratulations!</h4>
+                        <p>Your application has been successfully submitted! We will send you an email with your login details soon.</p>
+                        <hr>
+                        <p class="mb-0">If you need any assistance, please contact our support team.</p>
+                        <a href="/" class="btn btn-primary mt-3">Go back to Home Page</a>
+                    </div>
+
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <!-- inner page banner END -->
+</div>
+<!-- Content END-->
+ {% endblock %}

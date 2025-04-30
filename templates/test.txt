@@ -1,0 +1,350 @@
+<li class="dropdown active">
+                <a href="{% url 'create_events' %}" class="nav-link"><i data-feather="plus-circle"></i><span>Create Event</span></a>
+            </li>
+            <li class="dropdown active">
+                <a href="{% url 'blogs' %}" class="nav-link"><i data-feather="file-text"></i><span>Blogs</span></a>
+            </li>
+            <li class="dropdown active">
+                <a href="{% url 'create_blogs' %}" class="nav-link"><i data-feather="edit-3"></i><span>Create Blog</span></a>
+            </li>
+            <li class="dropdown active">
+                <a href="{% url 'news' %}" class="nav-link"><i data-feather="news"></i><span>News</span></a>
+            </li>
+            <li class="dropdown active">
+                <a href="{% url 'create_news' %}" class="nav-link"><i data-feather="edit-3"></i><span>Create News</span></a>
+            </li>
+
+
+# models.py
+from django.contrib.auth.models import User
+from django.db import models
+
+# Optional: User Profile extension
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15, unique=True)
+
+    def __str__(self):
+        return self.user.username
+
+
+
+# utils.py
+import random
+from django.core.mail import send_mail
+from django.conf import settings
+
+def generate_otp():
+    return str(random.randint(100000, 999999))
+
+def send_otp_email(user_email, otp):
+    subject = 'Your OTP Code'
+    message = f'Your OTP code is {otp}. Please use it to log in.'
+    send_mail(subject, message, settings.EMAIL_HOST_USER, [user_email])
+
+
+
+
+# views.py
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib.auth import login, logout
+from django.http import HttpResponse
+from .utils import generate_otp, send_otp_email
+
+# User Registration
+def register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+
+        # Create user
+        user = User.objects.create_user(username=username, password=password, email=email)
+
+        # Send OTP to the user email
+        otp = generate_otp()
+        send_otp_email(user.email, otp)
+
+        # Save OTP to session
+        request.session['otp'] = otp
+        return redirect('verify_otp')  # Redirect to OTP verification page
+
+    return render(request, 'auth_system/register.html')
+
+# OTP Verification for Registration
+def verify_otp(request):
+    if request.method == 'POST':
+        otp_entered = request.POST.get('otp')
+        otp_saved = request.session.get('otp')
+
+        if otp_entered == otp_saved:
+            return HttpResponse("OTP Verified. Registration successful!")
+        else:
+            return HttpResponse("Invalid OTP.")
+
+    return render(request, 'auth_system/verify_otp.html')
+
+# Login via OTP
+def login_otp(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        otp_entered = request.POST.get('otp')
+
+        try:
+            user = User.objects.get(username=username)
+            otp_saved = request.session.get('otp')
+
+            if otp_entered == otp_saved:
+                login(request, user)
+                return redirect('home')  # Redirect to home page after login
+            else:
+                return HttpResponse("Invalid OTP.")
+        except User.DoesNotExist:
+            return HttpResponse("User not found.")
+        
+    return render(request, 'auth_system/login_otp.html')
+
+# Logout
+def logout_view(request):
+    logout(request)
+    return redirect('login')
+
+# Password Reset Request (Send OTP)
+def ForgotPassword(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email=email)
+            otp = generate_otp()
+            send_otp_email(user.email, otp)
+
+            request.session['reset_otp'] = otp
+            return redirect('verify_reset_otp')
+        except User.DoesNotExist:
+            return HttpResponse("User not found.")
+
+    return render(request, 'auth_system/forgot_password.html')
+
+# Verify OTP for Password Reset
+def verify_reset_otp(request):
+    if request.method == 'POST':
+        otp_entered = request.POST.get('otp')
+        otp_saved = request.session.get('reset_otp')
+
+        if otp_entered == otp_saved:
+            return redirect('set_new_password')
+        else:
+            return HttpResponse("Invalid OTP.")
+
+    return render(request, 'auth_system/verify_reset_otp.html')
+
+# Set New Password
+def set_new_password(request):
+    if request.method == 'POST':
+        new_password = request.POST.get('password')
+        user = request.user  # Or retrieve user by email if not logged in
+
+        user.set_password(new_password)
+        user.save()
+
+        return redirect('login')
+
+    return render(request, 'auth_system/set_new_password.html')
+
+
+
+# urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('register/', views.register, name='register'),
+    path('verify_otp/', views.verify_otp, name='verify_otp'),
+    path('login/', views.login_otp, name='login_otp'),
+    path('logout/', views.logout_view, name='logout'),
+    path('reset_password/', views.reset_password, name='reset_password'),
+    path('verify_reset_otp/', views.verify_reset_otp, name='verify_reset_otp'),
+    path('set_new_password/', views.set_new_password, name='set_new_password'),
+]
+
+
+# auth_project/urls.py
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('auth/', include('auth_system.urls')),  # Include the auth system URLs
+]
+
+
+<!-- register.html -->
+<form method="POST">
+    {% csrf_token %}
+    <label for="username">Username</label>
+    <input type="text" name="username" required><br>
+
+    <label for="password">Password</label>
+    <input type="password" name="password" required><br>
+
+    <label for="email">Email</label>
+    <input type="email" name="email" required><br>
+
+    <button type="submit">Register</button>
+</form>
+
+
+<!-- login_otp.html -->
+<form method="POST">
+    {% csrf_token %}
+    <label for="username">Username</label>
+    <input type="text" name="username" required><br>
+
+    <label for="otp">OTP</label>
+    <input type="text" name="otp" required><br>
+
+    <button type="submit">Login with OTP</button>
+</form>
+
+
+<!-- verify_otp.html -->
+<form method="POST">
+    {% csrf_token %}
+    <label for="otp">OTP</label>
+    <input type="text" name="otp" required><br>
+
+    <button type="submit">Verify OTP</button>
+</form>
+
+
+<!-- set_new_password.html -->
+<form method="POST">
+    {% csrf_token %}
+    <label for="password">New Password</label>
+    <input type="password" name="password" required><br>
+
+    <button type="submit">Set New Password</button>
+</form>
+
+
+
+1. Content Management Systems (CMS)
+Django is a great framework for building custom CMS, where users can manage and publish digital content. Examples include:
+
+Blog platforms like WordPress alternatives.
+News portals with articles, images, and media.
+E-learning platforms with content creation and management tools.
+2. E-Commerce Websites
+Django can be used to create full-fledged e-commerce platforms. This includes:
+
+Product catalogs
+Shopping carts
+Payment gateways
+Order management systems
+Customer profiles and order history.
+Frameworks like Django Oscar and Saleor can speed up the development of such systems.
+
+3. Social Media Networks
+Django can be used to create custom social networking platforms with features like:
+
+User profiles
+Friendships/Following systems
+Newsfeeds
+Messaging systems
+Media uploads (images, videos)
+Think of a simplified version of Facebook or Twitter.
+
+4. APIs (RESTful & GraphQL APIs)
+Django can be used to build APIs that serve data to mobile apps or other web applications. This is commonly done using Django Rest Framework (DRF) for RESTful APIs or Graphene-Django for GraphQL APIs.
+
+Examples include:
+
+Mobile app backends
+Microservices
+Third-party data integrations
+5. Data Dashboards & Analytics Platforms
+Django can be used to build data-heavy applications with interactive dashboards for displaying business intelligence, statistics, and analytics data.
+
+Real-time data reporting
+Charts and graphs
+Data filtering and sorting
+Packages like Django Admin, Django REST Framework, and Plotly (for data visualization) are often used in such applications.
+
+6. Customer Support & Ticketing Systems
+Django can be used to build a system where users can raise tickets, track the status of their issues, and interact with customer support agents.
+
+Ticket management
+Support team dashboards
+Ticket status updates
+Knowledge base
+7. Event Management Platforms
+Django can power platforms where users can create, manage, and attend events. Features might include:
+
+Event creation and management
+RSVP systems
+Ticket booking and payment integration
+Event calendars and reminders
+Think of systems like Eventbrite.
+
+8. Job Portals
+Django can be used to build platforms that connect job seekers with employers, such as:
+
+Job listings
+Resume uploads
+Job applications and tracking
+Employer dashboards for posting jobs
+These systems can also integrate with LinkedIn or other social media for easy profile and job integration.
+
+9. Learning Management Systems (LMS)
+Django is often used to create online education platforms with features like:
+
+Course management
+Student progress tracking
+Quizzes and assignments
+Instructor-led lessons
+An example could be platforms like Moodle or Udemy.
+
+10. Real-time Applications (WebSockets)
+Django can be used with Django Channels to build real-time applications such as:
+
+Live chat systems
+Real-time notifications
+Collaborative platforms (like Google Docs)
+Live auctions or bidding systems
+11. Geo-Location & Mapping Applications
+Django can be used to build location-based applications:
+
+Geo-spatial databases with GeoDjango
+Maps and directions
+Location-based services (e.g., finding nearby stores, restaurants, etc.)
+12. Subscription-based or Membership Platforms
+Django can handle subscriptions and membership management, including:
+
+Paid subscriptions
+Access control to exclusive content
+Recurring billing and payment processing
+13. Survey and Polling Systems
+Django can be used to create survey and polling systems where users can participate in surveys or polls, with features like:
+
+Multiple choice questions
+Survey results and data visualization
+Anonymous participation
+14. File and Document Management Systems
+Django can be used to create systems for managing large numbers of files and documents, such as:
+
+Document upload and storage
+File categorization and metadata management
+Version control and collaboration on documents
+15. Online Booking Systems
+Django can support online booking platforms, such as:
+
+Appointment scheduling
+Hotel and restaurant bookings
+Event and tour reservations
+16. Subscription/Newsletters
+Django can help you build a system for sending newsletters, managing subscriptions, and tracking user engagement:
+
+Email campaigns
+User segmentation
+Analytics of email open/click rates

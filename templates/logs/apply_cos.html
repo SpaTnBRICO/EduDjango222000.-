@@ -1,0 +1,114 @@
+{% extends 'logs/baseg.html' %}
+{% load static %}
+{% block content %}
+ <!-- Content -->
+ <div class="page-content bg-white">
+    <!-- inner page banner -->
+    
+    <!-- Breadcrumb row -->
+    <div class="breadcrumb-row bg-dark">
+        <div class="container">
+            <ul class="list-inline">
+                <li><h1 class="text-white">Apply for {{ course.name }}</h1></li>
+            </ul>
+        </div>
+    </div>
+    <!-- Breadcrumb row END -->
+
+    <!-- inner page banner -->
+    <div class="page-banner contact-page section-sp2">
+        <div class="container">
+            {% for message in messages %}
+            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" arial-label="Close"></button>
+            </div>
+            {% endfor %}
+            <div class="row">
+                <div class="col-lg-5 col-md-5 m-b30">
+                    <div class="bg-primary text-white contact-info-bx">
+                        <h2 class="m-b10 title-head">Course <span>Information</span></h2>
+                        <p class="mb-0"> <strong>Name:</strong> {{ course.name }}</p>
+                        <p class="mb-0"> <strong>Department:</strong> {{ course.department.name }}</p>
+                        <p class="mb-0"> <strong>Price:</strong> ${{ course.price }}</p>
+                        <p class="mb-4"><strong>Period of Study:</strong> {{ course.period_of_study }} months</p>
+                        <h5 class="m-t0 m-b20">Follow Us</h5>
+                        <ul class="list-inline contact-social-bx">
+                            <li><a href="#" class="btn outline radius-xl"><i class="fa fa-facebook"></i></a></li>
+                            <li><a href="#" class="btn outline radius-xl"><i class="fa fa-twitter"></i></a></li>
+                            <li><a href="#" class="btn outline radius-xl"><i class="fa fa-linkedin"></i></a></li>
+                            <li><a href="#" class="btn outline radius-xl"><i class="fa fa-google-plus"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-7 col-md-7">
+                    <form class="contact-bx" method="POST" action="{% url 'cos_apply' course.id %}">
+                        {% csrf_token %}
+                        <div class="heading-bx left">
+                            <h2 class="title-head">Provide  <span>Your Details</span></h2>
+                            <p>fill all the fields</p>
+                        </div>
+                        <div class="row placeani">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <label>First Name</label>
+                                        <input name="first_name" type="text" required class="form-control valid-character">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <label>Last Name</label>
+                                        <input name="last_name" type="text" required class="form-control valid-character">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <div class="input-group"> 
+                                        <label>Your Email Address</label>
+                                        <input name="email" type="email" class="form-control" required >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Course</label>
+                                    <select class="form-control" name="course_id" required readonly>
+                                          <option value="{{ course.id }}" selected>{{ course.name }} ({{ course.department.name }})</option>
+                                    </select>
+                                  </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <label>Your Active WhatsApp Phone(+2547123....)</label>
+                                        <input name="phone_number" type="tel" required class="form-control int-value">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <div class="input-group">
+                                        <label>ID Number</label>
+                                        <input name="student_id" type="number" required class="form-control">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="col-lg-12">
+                                <button type="submit" class="btn button-md">Enrol</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- inner page banner END -->
+</div>
+<!-- Content END-->
+ {% endblock %}

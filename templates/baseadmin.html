@@ -1,0 +1,652 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- index.html  21 Nov 2019 03:44:50 GMT -->
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+  <title>TechSols</title>
+
+<!-- Bootstrap CSS (External) -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- General CSS Files -->
+<link rel="stylesheet" href="{% static 'dash/css/app.min.css' %}">
+
+<!-- Template CSS (Override Bootstrap and other general styles) -->
+<link rel="stylesheet" href="{% static 'dash/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'dash/css/components.css' %}">
+
+<!-- Custom CSS (For project-specific styles) -->
+<link rel="stylesheet" href="{% static 'dash/css/custom.css' %}">
+
+<!-- Favicon (should be last) -->
+<link rel='shortcut icon' type='image/x-icon' href="{% static 'dash/img/favicon.ico' %}" />
+
+
+
+
+</head>
+
+<body>
+  <div class="loader"></div>
+  <div id="app">
+    <div class="main-wrapper main-wrapper-1">
+      <div class="navbar-bg"></div>
+      <nav class="navbar navbar-expand-lg main-navbar sticky">
+        <div class="form-inline mr-auto">
+          <ul class="navbar-nav mr-3">
+            <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg
+									collapse-btn"> <i data-feather="align-justify"></i></a></li>
+            <li><a href="#" class="nav-link nav-link-lg fullscreen-btn">
+                <i data-feather="maximize"></i>
+              </a></li>
+            <li>
+              <form class="form-inline mr-auto">
+                <div class="search-element">
+                  <input class="form-control" type="search" placeholder="Search" aria-label="Search" data-width="200">
+                  <button class="btn" type="submit">
+                    <i class="fas fa-search"></i>
+                  </button>
+                </div>
+              </form>
+            </li>
+           
+            </li>
+          </ul>
+        </div>
+        <ul class="navbar-nav navbar-right">
+          {% if request.user.is_authenticated %}
+          <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown"
+              class="nav-link nav-link-lg message-toggle"><i data-feather="mail"></i>
+              {% if texts %}
+              <span class="badge headerBadge1">
+                {{texts}}</span>
+              {% else %}
+              <span class="badge headerBadge1">0</span>
+              {% endif %}
+                 </a>
+            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
+              <div class="dropdown-header">
+                Messages
+                <div class="float-right">
+                  <a href="#">Mark All As Read</a>
+                </div>
+              </div>
+              <div class="dropdown-list-content dropdown-list-message">
+                {% if unread %}
+                {% for i in unread %}
+                <a href="{% url 'email_read' i.id %}" class="dropdown-item"> <span class="dropdown-item-avatar
+                      text-white"> 
+                      {% if active_logo %}
+                      <img alt="image" src="{{active_logo.logo.url}}" class="rounded-circle">
+                      {% else %}
+                      <img alt="image" src="{% static 'dash/img/users/user-2.png' %}" class="rounded-circle">
+                      {% endif %}
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">{{i.name}}</span>
+                    <span class="time messege-text">Please check your mail !!</span>
+                    <span class="time">{{i.create_at|timesince}} Ago</span>
+                  </span>
+                </a> 
+                {% empty %}
+                <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-2.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Sarah
+                      Smith</span> <span class="time messege-text">Request for leave
+                      application</span>
+                    <span class="time">5 Min Ago</span>
+                  </span>
+                </a> 
+                <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-5.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Jacob
+                      Ryan</span> <span class="time messege-text">Your payment invoice is
+                      generated.</span> <span class="time">12 Min Ago</span>
+                  </span>
+                </a> 
+                <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-4.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Lina
+                      Smith</span> <span class="time messege-text">hii John, I have upload
+                      doc
+                      related to task.</span> <span class="time">30
+                      Min Ago</span>
+                  </span>
+                </a> 
+                <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-3.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Jalpa
+                      Joshi</span> <span class="time messege-text">Please do as specify.
+                      Let me
+                      know if you have any query.</span> <span class="time">1
+                      Days Ago</span>
+                  </span>
+                </a> 
+                <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-2.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Sarah
+                      Smith</span> <span class="time messege-text">Client Requirements</span>
+                    <span class="time">2 Days Ago</span>
+                  </span>
+                </a>
+                {% endfor %}
+                {% endif %}
+              </div>
+              <div class="dropdown-footer text-center">
+                <a href="{% url 'email_inbox' %}">View All <i class="fas fa-chevron-right"></i></a>
+              </div>
+            </div>
+          </li>
+          {% else %}
+          <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown"
+              class="nav-link nav-link-lg message-toggle"><i data-feather="mail"></i>
+              <span class="badge headerBadge1">
+                7</span>
+                 </a>
+            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
+              <div class="dropdown-header">
+                Messages
+                <div class="float-right">
+                  <a href="#">Mark All As Read</a>
+                </div>
+              </div>
+              <div class="dropdown-list-content dropdown-list-message">
+                <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar
+                      text-white"> <img alt="image" src="{% static 'dash/img/users/user-1.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">John
+                      Deo</span>
+                    <span class="time messege-text">Please check your mail !!</span>
+                    <span class="time">2 Min Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-2.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Sarah
+                      Smith</span> <span class="time messege-text">Request for leave
+                      application</span>
+                    <span class="time">5 Min Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-5.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Jacob
+                      Ryan</span> <span class="time messege-text">Your payment invoice is
+                      generated.</span> <span class="time">12 Min Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-4.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Lina
+                      Smith</span> <span class="time messege-text">hii John, I have upload
+                      doc
+                      related to task.</span> <span class="time">30
+                      Min Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-3.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Jalpa
+                      Joshi</span> <span class="time messege-text">Please do as specify.
+                      Let me
+                      know if you have any query.</span> <span class="time">1
+                      Days Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-avatar text-white">
+                    <img alt="image" src="{% static 'dash/img/users/user-2.png' %}" class="rounded-circle">
+                  </span> <span class="dropdown-item-desc"> <span class="message-user">Sarah
+                      Smith</span> <span class="time messege-text">Client Requirements</span>
+                    <span class="time">2 Days Ago</span>
+                  </span>
+                </a>
+              </div>
+              <div class="dropdown-footer text-center">
+                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+              </div>
+            </div>
+          </li>
+          {% endif %}
+          <li class="dropdown dropdown-list-toggle"><a href="#" data-toggle="dropdown"
+              class="nav-link notification-toggle nav-link-lg"><i data-feather="bell" class="bell"></i>
+            </a>
+            <div class="dropdown-menu dropdown-list dropdown-menu-right pullDown">
+              <div class="dropdown-header">
+                Notifications
+                <div class="float-right">
+                  <a href="#">Mark All As Read</a>
+                </div>
+              </div>
+              <div class="dropdown-list-content dropdown-list-icons">
+                <a href="#" class="dropdown-item dropdown-item-unread"> <span
+                    class="dropdown-item-icon bg-primary text-white"> <i class="fas
+												fa-code"></i>
+                  </span> <span class="dropdown-item-desc"> Template update is
+                    available now! <span class="time">2 Min
+                      Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-icon bg-info text-white"> <i class="far
+												fa-user"></i>
+                  </span> <span class="dropdown-item-desc"> <b>You</b> and <b>Dedik
+                      Sugiharto</b> are now friends <span class="time">10 Hours
+                      Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-icon bg-success text-white"> <i
+                      class="fas
+												fa-check"></i>
+                  </span> <span class="dropdown-item-desc"> <b>Kusnaedi</b> has
+                    moved task <b>Fix bug header</b> to <b>Done</b> <span class="time">12
+                      Hours
+                      Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-icon bg-danger text-white"> <i
+                      class="fas fa-exclamation-triangle"></i>
+                  </span> <span class="dropdown-item-desc"> Low disk space. Let's
+                    clean it! <span class="time">17 Hours Ago</span>
+                  </span>
+                </a> <a href="#" class="dropdown-item"> <span class="dropdown-item-icon bg-info text-white"> <i class="fas
+												fa-bell"></i>
+                  </span> <span class="dropdown-item-desc"> Welcome to Otika
+                    template! <span class="time">Yesterday</span>
+                  </span>
+                </a>
+              </div>
+              <div class="dropdown-footer text-center">
+                <a href="#">View All <i class="fas fa-chevron-right"></i></a>
+              </div>
+            </div>
+          </li>
+          {% if pic and pic.profile_picture %}
+          <li class="dropdown"><a href="#" data-toggle="dropdown"
+              class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+			  <img alt="image" src="{{ pic.profile_picture.url }}"
+                class="user-img-radious-style">
+
+				 <span class="d-sm-none d-lg-inline-block"></span></a>
+            <div class="dropdown-menu dropdown-menu-right pullDown">
+              <div class="dropdown-title">Hello {{ user.first_name }}</div>
+              <a href="{% url 'user_profile' %}" class="dropdown-item has-icon"> <i class="far
+										fa-user"></i> Profile
+              </a> <a href="#" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>
+                Activities
+              </a> <a href="{% url 'user_profile' %}" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'signout' %}" class="dropdown-item has-icon text-danger"> <i class="fas fa-sign-out-alt"></i>
+                Logout
+              </a>
+            </div>
+          </li>
+          {% else %}
+          <li class="dropdown"><a href="#" data-toggle="dropdown"
+              class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+        <img alt="image" src="{% static 'dash/img/logo.png' %}"
+                class="user-img-radious-style">
+
+         <span class="d-sm-none d-lg-inline-block"></span></a>
+            <div class="dropdown-menu dropdown-menu-right pullDown">
+              <div class="dropdown-title">Hello {{ user.first_name }}</div>
+              <a href="{% url 'user_profile' %}" class="dropdown-item has-icon"> <i class="far
+                    fa-user"></i> Profile
+              </a> <a href="#" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>
+                Activities
+              </a> <a href="{% url 'user_profile' %}" class="dropdown-item has-icon"> <i class="fas fa-cog"></i>
+                Settings
+              </a>
+              <div class="dropdown-divider"></div>
+              <a href="{% url 'signout' %}" class="dropdown-item has-icon text-danger"> <i class="fas fa-sign-out-alt"></i>
+                Logout
+              </a>
+            </div>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      <div class="main-sidebar sidebar-style-2">
+        <aside id="sidebar-wrapper">
+          <div class="sidebar-brand">
+            {% if active_logo %}
+            <a href="/"> <img alt="image" src="{{active_logo.logo.url}}" class="header-logo" /> <span
+                class="logo-name">KMET</span>
+            </a>
+            {% else %}
+            <a href="/"> <img alt="image" src="{% static 'dash/img/logo.png' %}" class="header-logo" /> <span
+                class="logo-name">TechSols</span>
+            </a>
+            {% endif %}
+          </div>
+          {% if request.user.is_authenticated %}
+          <ul class="sidebar-menu">
+            {% if request.user.is_admin %}
+            <li class="menu-header">Main</li>
+             <li class="dropdown active">
+                <a href="{% url 'home' %}" class="nav-link"><i data-feather="home"></i><span>Home</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'admin_dashboard' %}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="#" class="menu-toggle nav-link has-dropdown"><i data-feather="mail"></i><span>Email</span></a>
+              <ul class="dropdown-menu">
+                <li class="active"><a class="nav-link" href="{% url 'email_inbox' %}">Inbox</a></li>
+                <li><a class="nav-link" href="{% url 'email_compose' %}">Compose</a></li>
+              </ul>
+            </li>
+
+            <li class="menu-header">Courses Management</li>
+            <li class="dropdown active">
+            <a href="{% url 'view_departments' %}" class="nav-link"><i data-feather="layers"></i><span>Departments</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'create_department' %}" class="nav-link"><i data-feather="plus-circle"></i><span>Create Department</span></a>
+              </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_course' %}" class="nav-link"><i data-feather="book"></i><span>Courses</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'create_course' %}" class="nav-link"><i data-feather="plus-circle"></i><span>Create Course</span></a>
+            </li>
+
+            <li class="menu-header">Student Management</li>
+            <li class="dropdown active">
+            <a href="{% url 'all_students' %}" class="nav-link"><i data-feather="user"></i><span>Students</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'apply_for_course' %}" class="nav-link"><i data-feather="edit-3"></i><span>Enroll a Student</span></a>
+            </li>
+
+            <li class="menu-header">Instructors</li>
+            <li class="dropdown active">
+            <a href="{% url 'teacher_list' %}" class="nav-link"><i data-feather="users"></i><span>Instructors</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'add_teacher' %}" class="nav-link"><i data-feather="user-plus"></i><span>Add Instructor</span></a>
+            </li>
+            <li class="menu-header">Assignments & Notes</li>
+            <li class="dropdown active">
+            <a href="{% url 'g_post_assignment' %}" class="nav-link"><i data-feather="file-text"></i><span>Post Assignment</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_assignments' %}" class="nav-link"><i data-feather="file"></i><span>View Posted Assignments</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'create_note' %}" class="nav-link"><i data-feather="edit"></i><span>Post Notes</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_notes' %}" class="nav-link"><i data-feather="file-text"></i><span>View Posted Notes</span></a>
+            </li>
+
+            <li class="menu-header">Tutorials</li>
+            <li class="dropdown active">
+            <a href="{% url 'create_tutorial' %}" class="nav-link"><i data-feather="play-circle"></i><span>Post Tutorial</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_tutorials' %}" class="nav-link"><i data-feather="video"></i><span>View Posted Tutorials</span></a>
+            </li>
+
+            <li class="menu-header">Quizzes</li>
+            <li class="dropdown active">
+            <a href="{% url 'quiz_list' %}" class="nav-link"><i data-feather="help-circle"></i><span>Quizzes</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'create_quiz' %}" class="nav-link"><i data-feather="plus-square"></i><span>Create Quiz</span></a>
+            </li>
+
+            <li class="menu-header">Administration</li>
+            <li class="dropdown active">
+            <a href="{% url 'confirm_letter' %}" class="nav-link"><i data-feather="mail"></i><span>Letter</span></a>
+            </li>
+            <li class="dropdown active">
+                <a href="{% url 'events' %}" class="nav-link"><i data-feather="calendar"></i><span>Events</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'create_events' %}" class="nav-link"><i data-feather="plus-circle"></i><span>Create Event</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'blogs' %}" class="nav-link"><i data-feather="file-text"></i><span>Blogs</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'create_blogs' %}" class="nav-link"><i data-feather="edit-3"></i><span>Create Blog</span></a>
+            </li>
+             <li class="dropdown active">
+                <a href="{% url 'news' %}" class="nav-link"><i data-feather="play-circle"></i><span>News</span></a>
+            </li>
+            <li class="dropdown active">
+                <a href="{% url 'create_news' %}" class="nav-link"><i data-feather="edit-3"></i><span>Create News</span></a>
+            </li>
+            
+          
+
+            <li class="menu-header">User Management</li>
+            <li class="dropdown active">
+            <a href="{% url 'user_profile' %}" class="nav-link"><i data-feather="user-check"></i><span>Profile</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'ShowUsers' %}" class="nav-link"><i data-feather="users"></i><span>Manage Users</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'letter_csv' %}" class="nav-link"><i data-feather="download"></i><span>Download Students</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'create_account' %}" class="nav-link"><i data-feather="log-in"></i><span>SignUp A New User</span></a>
+            </li>
+
+            <li class="menu-header">Settings</li>
+            <li class="dropdown active">
+            <a href="/create_slides/" class="nav-link"><i data-feather="bar-chart-2"></i><span>Create Slides</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="/manage_slides/" class="nav-link"><i data-feather="bar-chart-2"></i><span>Manage Slides</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'create_logos' %}" class="nav-link"><i data-feather="bar-chart-2"></i><span>Create Logos</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="/logos/" class="nav-link"><i data-feather="bar-chart-2"></i><span>Manage Logos</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="#" class="nav-link"><i data-feather="settings"></i><span>Settings</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'signout' %}" class="nav-link"><i data-feather="log-out"></i><span>Logout</span></a>
+            </li>
+            {% endif %}
+
+            {% if request.user.is_teacher %}
+            <li class="menu-header">Main</li>
+             <li class="dropdown active">
+                <a href="{% url 'home' %}" class="nav-link"><i data-feather="home"></i><span>Home</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'teacher_dashboard' %}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
+            </li>
+
+            <li class="menu-header">Assignments & Notes</li>
+            <li class="dropdown active">
+            <a href="{% url 'g_post_assignment' %}" class="nav-link"><i data-feather="file-text"></i><span>Post Assignment</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_assignments' %}" class="nav-link"><i data-feather="file"></i><span>View Posted Assignments</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'create_note' %}" class="nav-link"><i data-feather="edit"></i><span>Post Notes</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_notes' %}" class="nav-link"><i data-feather="file-text"></i><span>View Posted Notes</span></a>
+            </li>
+
+            <li class="menu-header">Tutorials</li>
+            <li class="dropdown active">
+            <a href="{% url 'create_tutorial' %}" class="nav-link"><i data-feather="play-circle"></i><span>Post Tutorial</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_tutorials' %}" class="nav-link"><i data-feather="video"></i><span>View Posted Tutorials</span></a>
+            </li>
+
+            <li class="menu-header">Quizzes</li>
+            <li class="dropdown active">
+            <a href="{% url 'quiz_list' %}" class="nav-link"><i data-feather="help-circle"></i><span>Quizzes</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'create_quiz' %}" class="nav-link"><i data-feather="plus-square"></i><span>Create Quiz</span></a>
+            </li>
+
+            <li class="menu-header">Reports & Settings</li>
+            <li class="dropdown active">
+              <a href="{% url 'blogs' %}" class="nav-link"><i data-feather="file-text"></i><span>Blogs</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'create_blogs' %}" class="nav-link"><i data-feather="edit-3"></i><span>Create Blog</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="#" class="nav-link"><i data-feather="bar-chart-2"></i><span>Reports</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'user_profile' %}" class="nav-link"><i data-feather="settings"></i><span>Settings</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'signout' %}" class="nav-link"><i data-feather="log-out"></i><span>Logout</span></a>
+            </li>
+
+
+            {% endif %}
+
+            {% if request.user.is_student %}
+            <li class="menu-header">Main</li>
+             <li class="dropdown active">
+                <a href="{% url 'home' %}" class="nav-link"><i data-feather="home"></i><span>Home</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'student_dashboard' %}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
+            </li>
+            <li class="menu-header">Finacials</li>
+            <li class="dropdown active">
+            <a href="{% url 'fee_payment' %}" class="nav-link"><i data-feather="file"></i><span>PayFees</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'fee_statement' %}" class="nav-link"><i data-feather="file"></i><span>FeeStatement</span></a>
+              </li>
+            <li class="menu-header">Assignments & Notes</li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_assignments' %}" class="nav-link"><i data-feather="file"></i><span>Assignments</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_notes' %}" class="nav-link"><i data-feather="file-text"></i><span>Notes</span></a>
+            </li>
+            <li class="menu-header">Tutorials</li>
+            <li class="dropdown active">
+            <a href="{% url 'view_posted_tutorials' %}" class="nav-link"><i data-feather="video"></i><span>Tutorials</span></a>
+            </li>
+            <li class="menu-header">Quizzes</li>
+            <li class="dropdown active">
+            <a href="{% url 'quiz_list' %}" class="nav-link"><i data-feather="help-circle"></i><span>Quizzes</span></a>
+            </li>
+            <li class="menu-header">Exam</li>
+            <li class="dropdown active">
+            <a href="{% url 'results' %}" class="nav-link"><i data-feather="file"></i><span>ExamReport</span></a>
+            </li>
+            <li class="menu-header">Reports & Settings</li>
+            <li class="dropdown active">
+              <a href="{% url 'blogs' %}" class="nav-link"><i data-feather="file-text"></i><span>Blogs</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'create_blogs' %}" class="nav-link"><i data-feather="edit-3"></i><span>Create Blog</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="#" class="nav-link"><i data-feather="bar-chart-2"></i><span>Reports</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="#" class="nav-link"><i data-feather="settings"></i><span>Settings</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'signout' %}" class="nav-link"><i data-feather="log-out"></i><span>Logout</span></a>
+            </li>
+
+            {% endif %}
+
+            {% if request.user.is_customer%}
+            <li class="menu-header">Main</li>
+            <li class="dropdown active">
+                <a href="{% url 'home' %}" class="nav-link"><i data-feather="home"></i><span>Home</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'customer_dashboard' %}" class="nav-link"><i data-feather="monitor"></i><span>Dashboard</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="#" class="nav-link"><i data-feather="monitor"></i><span>SHOP</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="#" class="nav-link"><i data-feather="monitor"></i><span>CART</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="#" class="nav-link"><i data-feather="monitor"></i><span>ON TRANSIT PRODUCTS</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="#" class="nav-link"><i data-feather="monitor"></i><span>DELIVERED PRODUCTS</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="#" class="nav-link"><i data-feather="monitor"></i><span>PAYMENT STATEMENTS</span></a>
+            </li>
+            <li class="menu-header">Reports & Settings</li>
+            <li class="dropdown active">
+              <a href="{% url 'blogs' %}" class="nav-link"><i data-feather="file-text"></i><span>Blogs</span></a>
+            </li>
+            <li class="dropdown active">
+              <a href="{% url 'create_blogs' %}" class="nav-link"><i data-feather="edit-3"></i><span>Create Blog</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="#" class="nav-link"><i data-feather="bar-chart-2"></i><span>Reports</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="#" class="nav-link"><i data-feather="settings"></i><span>Settings</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'signout' %}" class="nav-link"><i data-feather="log-out"></i><span>Logout</span></a>
+            </li>
+            {% endif %}
+            
+          </ul>
+          {% endif %}
+        </aside>
+      </div>
+      <!-- Main Content -->
+      <div class="main-content">
+        
+        
+		{% block content %}
+		{% endblock content %}
+
+	  </div>
+	  <footer class="main-footer">
+        <div class="footer-left">
+          <a href="#">BricoTech</a></a>
+        </div>
+        <div class="footer-right">
+        </div>
+      </footer>
+    </div>
+  </div>
+  <!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/feather-icons"></script>
+
+<!-- General JS Scripts -->
+<script src="{% static 'dash/js/app.min.js' %}"></script>
+
+<!-- JS Libraries -->
+<script src="{% static 'dash/bundles/apexcharts/apexcharts.min.js' %}"></script>
+
+<!-- Page Specific JS File -->
+<script src="{% static 'dash/js/page/index.js' %}"></script>
+
+<!-- Template JS File -->
+<script src="{% static 'dash/js/scripts.js' %}"></script>
+
+<!-- Custom JS File -->
+<script src="{% static 'dash/js/custom.js' %}"></script>
+
+
+
+<!-- intl-tel-input JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+</body>
+</html>

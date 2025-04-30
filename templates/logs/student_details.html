@@ -1,0 +1,134 @@
+{% extends '../baseadmin.html' %}
+{% load static %}
+{% block content %}
+  <section class="section">
+    <div class="section-body">
+      <div class="row mt-sm-4">
+        <div class="col-12 col-md-12 col-lg-8">
+          <div class="card">
+            <div class="padding-20">
+              <div class="tab-content tab-bordered" id="myTab3Content">
+                <div class="tab-pane fade show active" id="about" role="tabpanel" aria-labelledby="home-tab2">
+                  
+                  <div class="section-title">BIO</div>
+                  <ul>
+                    <li><strong>Student ID:</strong> {{ student.student_id }}</li>
+                    <li><strong>Full Name:</strong> {{ student.first_name }} {{ student.last_name }}</li>
+                    <li><strong>Email:</strong> {{ student.email }}</li>
+                  </ul>
+                  <div class="section-title">Academic</div>
+                  <ul>
+                    <li><strong>Course:</strong> {{ student.course.name }}</li>
+                    <li><strong>Approval Status:</strong> {% if student.is_approved %} Approved {% else %} Not Approved {% endif %}</li>
+                    <li><strong>Application Year:</strong> {{ student.application_year }}</li>
+                    <li><strong>Registration Number:</strong> {{ student.registration_number }}</li>
+                    <li><strong>Registered:</strong> {{ student.created_at|timesince }} ago</li>
+                    <li><strong>Joined:</strong> {{ student.created_at }}</li>
+                  </ul>
+                  <div class="section-title">Fees Information</div>
+                  <ul>
+                    <li><strong>Total Paid:</strong> ${{ student.total_paid }}</li>
+                    <li><strong>Total Fees:</strong> ${{ student.total_fees }}</li>
+                    <li><strong>Remaining Balance:</strong> ${{ student.remaining_balance }}</li>
+                  </ul>
+                  <a href="{% url 'all_students' %}" class="btn btn-primary">Back to All Students</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div class="settingSidebar">
+    <a href="javascript:void(0)" class="settingPanelToggle"> <i class="fa fa-spin fa-cog"></i>
+    </a>
+    <div class="settingSidebar-body ps-container ps-theme-default">
+      <div class=" fade show active">
+        <div class="setting-panel-header">Setting Panel
+        </div>
+        <div class="p-15 border-bottom">
+          <h6 class="font-medium m-b-10">Select Layout</h6>
+          <div class="selectgroup layout-color w-50">
+            <label class="selectgroup-item">
+              <input type="radio" name="value" value="1" class="selectgroup-input-radio select-layout" checked>
+              <span class="selectgroup-button">Light</span>
+            </label>
+            <label class="selectgroup-item">
+              <input type="radio" name="value" value="2" class="selectgroup-input-radio select-layout">
+              <span class="selectgroup-button">Dark</span>
+            </label>
+          </div>
+        </div>
+        <div class="p-15 border-bottom">
+          <h6 class="font-medium m-b-10">Sidebar Color</h6>
+          <div class="selectgroup selectgroup-pills sidebar-color">
+            <label class="selectgroup-item">
+              <input type="radio" name="icon-input" value="1" class="selectgroup-input select-sidebar">
+              <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
+                data-original-title="Light Sidebar"><i class="fas fa-sun"></i></span>
+            </label>
+            <label class="selectgroup-item">
+              <input type="radio" name="icon-input" value="2" class="selectgroup-input select-sidebar" checked>
+              <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
+                data-original-title="Dark Sidebar"><i class="fas fa-moon"></i></span>
+            </label>
+          </div>
+        </div>
+        <div class="p-15 border-bottom">
+          <h6 class="font-medium m-b-10">Color Theme</h6>
+          <div class="theme-setting-options">
+            <ul class="choose-theme list-unstyled mb-0">
+              <li title="white" class="active">
+                <div class="white"></div>
+              </li>
+              <li title="cyan">
+                <div class="cyan"></div>
+              </li>
+              <li title="black">
+                <div class="black"></div>
+              </li>
+              <li title="purple">
+                <div class="purple"></div>
+              </li>
+              <li title="orange">
+                <div class="orange"></div>
+              </li>
+              <li title="green">
+                <div class="green"></div>
+              </li>
+              <li title="red">
+                <div class="red"></div>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="p-15 border-bottom">
+          <div class="theme-setting-options">
+            <label class="m-b-0">
+              <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
+                id="mini_sidebar_setting">
+              <span class="custom-switch-indicator"></span>
+              <span class="control-label p-l-10">Mini Sidebar</span>
+            </label>
+          </div>
+        </div>
+        <div class="p-15 border-bottom">
+          <div class="theme-setting-options">
+            <label class="m-b-0">
+              <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
+                id="sticky_header_setting">
+              <span class="custom-switch-indicator"></span>
+              <span class="control-label p-l-10">Sticky Header</span>
+            </label>
+          </div>
+        </div>
+        <div class="mt-4 mb-4 p-3 align-center rt-sidebar-last-ele">
+          <a href="#" class="btn btn-icon icon-left btn-primary btn-restore-theme">
+            <i class="fas fa-undo"></i> Restore Default
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}
