@@ -283,11 +283,11 @@ class Course(models.Model):
         return self.name
 
 class Unit(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    name = models.CharField(max_length=15, unique=True, blank=True, null=True)
-    teacher = models.CharField(max_length=15, unique=True, blank=True, null=True)
-    unit_code = models.CharField(max_length=15, unique=True, blank=True, null=True)
-    created_by = models.CharField(max_length=15, unique=True, blank=True, null=True)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='units')
+    name = models.CharField(max_length=15, blank=True, null=True)
+    teacher = models.CharField(max_length=15, blank=True, null=True)
+    unit_code = models.CharField(max_length=15, unique=True, blank=True, null=True, editable=False)
+    created_by = models.CharField(max_length=15, blank=True, null=True)
     modified_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
 
@@ -329,7 +329,7 @@ class StudentApp(models.Model):
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True, blank=True, editable=False)
     total_fees = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True, blank=True, editable=False)
     remaining_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='students')
     application_year = models.IntegerField(default=timezone.now().year, editable=False)
     registration_number = models.CharField(max_length=50, blank=True, null=True, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)

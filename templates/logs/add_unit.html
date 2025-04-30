@@ -4,42 +4,43 @@
     <section class="section">
       <div class="section-body">
         <div class="row">
-          <div class="col-12">
+            <div class="col-12 col-md-3 col-lg-3"></div>
+          <div class="col-12 col-md-6 col-lg-6">
             {% for message in messages %}
-            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             {% endfor %}
-            <form method="POST" action="{% url 'edit_department' department.id  %}">
+            <form method="POST" action="{% url 'add_unit' cos.id %}">
                 {% csrf_token %}
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Edit Department</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group row mb-4">
-                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Name</label>
-                        <div class="col-sm-12 col-md-7">
-                            <input name="title" type="text" class="form-control" value="{{department.name}}">
-                        </div>
-                        </div>
-                        <div class="form-group row mb-4">
-                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Tution</label>
-                        <div class="col-sm-12 col-md-7">
-                            <input name="is_tution" type="checkbox" {% if department.is_tution %} checked {% endif %}>
-                        </div>
-                        </div>
-                        <div class="form-group row mb-4">
-                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3"></label>
-                        <div class="col-sm-12 col-md-7">
-                            <button class="btn btn-primary">Edit Department</button>
-                        </div>
-                    </div>
+            <div class="card">
+
+              <div class="card-header">
+                <h4>Add Unit</h4>
+              </div>
+              <div class="card-body">
+                <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" class="form-control" name="title" required>
                 </div>
+                
+                  
+                <div class="form-group">
+                  <label>Course</label>
+                  <select class="form-control" name="department" required>                    
+                        <option value="{{ cos.id }}">{{ cos.name }}</option>
+                  </select>
                 </div>
+                
+              </div>
+              <div class="card-footer text-right">
+                <button class="btn btn-primary mr-1" type="submit">Submit</button>
+              </div>
+            </div>
             </form>
           </div>
+          <div class="col-12 col-md-3 col-lg-3"></div>
         </div>
       </div>
     </section>

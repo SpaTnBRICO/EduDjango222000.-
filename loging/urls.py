@@ -30,6 +30,7 @@ urlpatterns = [
     path('edit_department/<int:id>/',views.edit_department, name="edit_department"),
     path('delete_department/<int:id>/', views.delete_department, name="delete_department"),
     path('create_course/',views.create_course, name="create_course"),
+    path('add_unit/<int:id>/',views.add_unit, name="add_unit"),
     path('edit_course/<int:id>/',views.edit_course, name="edit_course"),
     path('create_department/',views.create_department, name="create_department"),
     path('courses/',views.view_course, name="view_course"),

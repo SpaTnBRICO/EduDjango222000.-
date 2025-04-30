@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from useraccess.models import Course, Department, StudentApp, Teacher, UserProfile, CustomerUser
+from useraccess.models import Course, Department, StudentApp, Teacher, UserProfile, CustomerUser, Unit
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import FeePayment, SiteLogo, GoogleFormAssignment, Tutorial, Notes, Quiz, Question, Answer, QuizAttempt, Contact, Reply, ComposeEmail, Event, Blog, News, Slider
@@ -810,6 +810,46 @@ def create_course(request):
     return render(request, "logs/course_update.html", {
         'departments': departments,
         'user_profile':user_profile,
+    })
+
+@login_required
+def add_unit(request, id):
+    # Get all departments to populate the select box in the form
+    cos = Course.objects.get(id=id)
+    if request.method == "POST":
+        # Get form data
+        title = request.POST.get('title')
+        course_id = request.POST.get('department')
+
+        # Check if the required fields are provided
+        if not course_id:
+            messages.error(request, "Please select a course.")
+            return redirect(f'/add_unit/<int:{cos}>/')
+
+        try:
+            course = Course.objects.get(id=course_id)  # Get the COURSE by ID
+        except Course.DoesNotExist:
+            messages.error(request, "Invalid course selected.")
+            return redirect(f'/add_unit/<int:{cos}>/')
+
+        # Create the new course
+        unit = Unit(
+            name=title,
+            course=course,
+            teacher=request.user,
+            created_by=request.user
+        )
+
+        unit.save()  # Save the course
+
+        # Show success message
+        messages.success(request, f"Unit '{title}' created successfully.")
+
+        return redirect(f'/add_unit/{cos.id}/')  # Redirect to the course creation page
+
+    # Render the form with departments for GET request
+    return render(request, "logs/add_unit.html", {
+        'cos': cos,
     })
 
 
