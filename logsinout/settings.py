@@ -44,7 +44,7 @@ netsh advfirewall firewall add rule name="Allow Django 8000" protocol=TCP dir=in
 """
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://ba39-197-232-12-20.ngrok-free.app"
+    "https://4eaf-197-232-12-20.ngrok-free.app"
 ]
 
 

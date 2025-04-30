@@ -26,7 +26,7 @@ from django.core.paginator import Paginator
 
 #WhatsApp
 import os
-from twilio.rest import Client
+#from twilio.rest import Client
 from django.conf import settings
 
 #Email Sending stuff

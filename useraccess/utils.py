@@ -13,7 +13,7 @@ from django.contrib import messages
 
 #WhatsApp Stuff
 import os
-from twilio.rest import Client
+#from twilio.rest import Client
 from django.conf import settings
 import time
 

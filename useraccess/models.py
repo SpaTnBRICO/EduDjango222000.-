@@ -14,7 +14,7 @@ from django.contrib import messages
 
 #WhatsApp
 import os
-from twilio.rest import Client
+#from twilio.rest import Client
 from django.conf import settings
 import logging
 from django.shortcuts import get_object_or_404
