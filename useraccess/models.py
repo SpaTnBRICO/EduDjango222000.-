@@ -516,7 +516,11 @@ class Teacher(models.Model):
 class CAT(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='cats')
     title = models.CharField(max_length=50)
+    attendance_sheet = models.FileField(upload_to='test_attendance/cats/', null=True, blank=True)
+    mark_sheet = models.FileField(upload_to='marksheets/cats/', null=True, blank=True)
+    pc_waiting = models.FileField(upload_to='pc_waiting/cats/', null=True, blank=True)
     is_approved = models.BooleanField(default=False)
+    
 
     def __str__(self):
         return f"{self.title} - {self.unit.name}"

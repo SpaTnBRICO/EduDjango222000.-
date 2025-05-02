@@ -21,6 +21,8 @@ from .genrateAcesstoken import get_access_token
 from .stkPush import initiate_stk_push
 from .query import query_stk_status
 
+import mimetypes #Validatin pdf stuff
+
 
 # Create your views here.
 def home(request):
@@ -1558,18 +1560,59 @@ def edit_question(request, question_id):
     return render(request, 'logs/edit_question.html', {'question': question, 'answers': answers, 'user_profile': user_profile})
 
 
+def is_pdf(file):
+    return file and mimetypes.guess_type(file.name)[0] == 'application/pdf'
+
 def create_cat(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         unit_id = request.POST.get('unit')
+        course_id = request.POST.get('course')
 
-        if title and unit_id:
+        att = request.FILES.get('att')
+        mark = request.FILES.get('mark')
+        pc_waiting = request.FILES.get('pc_waiting')
+
+        errors = []
+
+        if not title:
+            errors.append("Title is required.")
+        if not unit_id:
+            errors.append("Unit is required.")
+        if att and not is_pdf(att):
+            errors.append("Test Attendance file must be a PDF.")
+        if mark and not is_pdf(mark):
+            errors.append("Mark Sheet file must be a PDF.")
+        if pc_waiting and not is_pdf(pc_waiting):
+            errors.append("PC Waiting List file must be a PDF.")
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+        else:
             unit = get_object_or_404(Unit, id=unit_id)
-            CAT.objects.create(title=title, unit=unit)
-            return redirect('/cat_list/')  # Change to your actual CAT list view name
+
+            cat = CAT.objects.create(
+                title=title,
+                unit=unit
+            )
+
+            # Save optional files only if provided
+            if att:
+                cat.attendance_sheet = att
+            if mark:
+                cat.mark_sheet = mark
+            if pc_waiting:
+                cat.pc_waiting = pc_waiting
+
+            cat.save()
+
+            messages.success(request, "CAT created successfully.")
+            return redirect('/cat_list/')
 
     courses = Course.objects.all()
     return render(request, 'logs/cat_env.html', {'courses': courses})
+
 
 
 @login_required
