@@ -70,6 +70,7 @@ urlpatterns = [
 
     path('enter_cat_scores/<int:cat_id>/', views.enter_cat_scores, name="marks_entry"),
     path('create_cat/', views.create_cat, name="create_cat"),
+    path('ajax/get-units/', views.get_units_by_course, name='get_units_by_course'),
     path('cat_list/', views.cat_list_view, name="cat_list_view"),
     path('cat_results/', views.marks_view, name="marks_view"),
 

@@ -32,9 +32,10 @@
                         <td>{{ cat.title }}</td>
                         <td>{{ cat.unit.name }}</td>
                         <td>{{ cat.unit.course.name }}</td>
-                        <td>{{ cat.created_at|date:"M d, Y H:i" }}</td>
+                        <td><a href="#" class="btn btn-sm btn-success">Approved</a>
+                        </td>
                         <td>
-                          <a href="{% url 'marks_entry' cat.id %}" class="btn btn-sm btn-info">Enter Marks</a>
+                          <a href="{% url 'marks_entry' cat.id %}" class="btn btn-sm btn-info">Enter Marks/View</a>
                         </td>
                       </tr>
                     {% endfor %}

@@ -25,6 +25,16 @@ def delete_student_application(sender, instance, **kwargs):
         print(f"No StudentApplication found for {instance.username}")
         # If no associated StudentApplication exists, do nothing
 
+@receiver(post_save, sender=StudentApp)
+def create_cat_scores_for_new_student(sender, instance, created, **kwargs):
+    if created:
+        # Find all CATs in units under this student's course
+        cats = CAT.objects.filter(unit__course=instance.course)
+        for cat in cats:
+            CATScore.objects.get_or_create(cat=cat, student=instance)
+
+            
+
 @receiver(post_save, sender=CAT)
 def create_cat_scores_for_students(sender, instance, created, **kwargs):
     if created:

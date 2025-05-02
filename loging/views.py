@@ -789,6 +789,8 @@ def create_course(request):
         price = request.POST.get('price')
         period_of_study = request.POST.get('duration')  # in months
 
+        pic = request.FILES.get('pic')
+
         # Check if the required fields are provided
         if not department_id:
             messages.error(request, "Please select a department.")
@@ -806,7 +808,8 @@ def create_course(request):
             description=description,
             department=department,
             price=price,
-            period_of_study=period_of_study
+            period_of_study=period_of_study,
+            image=pic
         )
 
         course.save()  # Save the course
@@ -1555,19 +1558,27 @@ def edit_question(request, question_id):
     return render(request, 'logs/edit_question.html', {'question': question, 'answers': answers, 'user_profile': user_profile})
 
 
-@login_required
 def create_cat(request):
     if request.method == 'POST':
         title = request.POST.get('title')
         unit_id = request.POST.get('unit')
-        
-        if title and unit_id:
-            unit = Unit.objects.get(id=unit_id)
-            cat = CAT.objects.create(title=title, unit=unit)
-            return redirect(f'/cat_list/')  # Update this name to match your URLs
 
-    units = Unit.objects.all()
-    return render(request, 'logs/cat_env.html', {'units': units})
+        if title and unit_id:
+            unit = get_object_or_404(Unit, id=unit_id)
+            CAT.objects.create(title=title, unit=unit)
+            return redirect('/cat_list/')  # Change to your actual CAT list view name
+
+    courses = Course.objects.all()
+    return render(request, 'logs/cat_env.html', {'courses': courses})
+
+
+@login_required
+def get_units_by_course(request):
+    course_id = request.GET.get('course_id')
+    units = Unit.objects.filter(course_id=course_id).values('id', 'name')
+    return JsonResponse(list(units), safe=False)
+
+
 
 
 @login_required

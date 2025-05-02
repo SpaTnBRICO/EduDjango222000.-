@@ -11,7 +11,6 @@
             <h4>Create New CAT</h4>
           </div>
           <div class="card-body">
-            {# Show Django messages if any #}
             {% if messages %}
               {% for message in messages %}
                 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
@@ -25,50 +24,40 @@
 
             <form method="post" novalidate>
               {% csrf_token %}
+
               <div class="form-group">
                 <label for="title">CAT Title</label>
                 <input 
                   type="text" 
                   name="title" 
                   id="title" 
-                  class="form-control {% if form.title.errors %}is-invalid{% endif %}" 
+                  class="form-control" 
                   placeholder="e.g. CAT 1" 
                   value="{{ request.POST.title }}" 
                   required>
-                {% if form.title.errors %}
-                  <div class="invalid-feedback">
-                    {{ form.title.errors.0 }}
-                  </div>
-                {% else %}
-                  <div class="invalid-feedback">
-                    Please provide a CAT title.
-                  </div>
-                {% endif %}
+                <div class="invalid-feedback">Please provide a CAT title.</div>
+              </div>
+
+              <div class="form-group">
+                <label for="course">Course</label>
+                <select name="course" id="course" class="form-control" required>
+                  <option value="">-- Select Course --</option>
+                  {% for course in courses %}
+                    <option value="{{ course.id }}"
+                      {% if request.POST.course == course.id|stringformat:"s" %}selected{% endif %}>
+                      {{ course.name }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">Please select a course.</div>
               </div>
 
               <div class="form-group">
                 <label for="unit">Unit</label>
-                <select 
-                  name="unit" 
-                  id="unit" 
-                  class="form-control {% if form.unit.errors %}is-invalid{% endif %}" 
-                  required>
+                <select name="unit" id="unit" class="form-control" required>
                   <option value="">-- Select Unit --</option>
-                  {% for unit in units %}
-                    <option value="{{ unit.id }}" {% if request.POST.unit == unit.id|stringformat:"s" %}selected{% endif %}>
-                      {{ unit.name }}
-                    </option>
-                  {% endfor %}
                 </select>
-                {% if form.unit.errors %}
-                  <div class="invalid-feedback">
-                    {{ form.unit.errors.0 }}
-                  </div>
-                {% else %}
-                  <div class="invalid-feedback">
-                    Please select a unit.
-                  </div>
-                {% endif %}
+                <div class="invalid-feedback">Please select a unit.</div>
               </div>
 
               <button type="submit" class="btn btn-primary mt-3">Create CAT</button>
@@ -80,22 +69,34 @@
   </div>
 </section>
 
+<!-- jQuery for AJAX -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <script>
-  // Bootstrap form validation styling
-  (function () {
-    'use strict';
-    window.addEventListener('load', function () {
-      const forms = document.getElementsByTagName('form');
-      Array.prototype.filter.call(forms, function (form) {
-        form.addEventListener('submit', function (event) {
-          if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
-          form.classList.add('was-validated');
-        }, false);
+  $('#course').on('change', function () {
+    const courseId = $(this).val();
+    const unitSelect = $('#unit');
+
+    unitSelect.empty().append('<option value="">-- Loading units... --</option>');
+
+    if (courseId) {
+      $.ajax({
+        url: "{% url 'get_units_by_course' %}",
+        data: { course_id: courseId },
+        success: function (data) {
+          unitSelect.empty().append('<option value="">-- Select Unit --</option>');
+          data.forEach(unit => {
+            unitSelect.append(`<option value="${unit.id}">${unit.name}</option>`);
+          });
+        },
+        error: function () {
+          unitSelect.empty().append('<option value="">Error loading units</option>');
+        }
       });
-    }, false);
-  })();
+    } else {
+      unitSelect.empty().append('<option value="">-- Select Unit --</option>');
+    }
+  });
 </script>
+
 {% endblock content %}

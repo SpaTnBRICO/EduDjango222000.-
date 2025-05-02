@@ -9,7 +9,10 @@
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h4>{{ cat.unit.course.name }} {{ cat.title }} Marks Entry Form</h4>
+            <h4>{{ cat.title }} Marks Entry Form</h4>---
+            <h4>COURSE: {{ cat.unit.course.name }}</h4>---
+            <h4>UNIT: {{ cat.unit.name }}</h4>
+
           </div>
           <div class="card-body">
             <form method="POST" action="{% url 'marks_entry' cat.id %}" enctype="multipart/form-data">

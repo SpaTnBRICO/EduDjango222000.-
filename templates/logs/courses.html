@@ -10,10 +10,10 @@
 		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
 		  <article class="article card">
 			<div class="article-header">
-			  <div class="article-image" data-background="{% static 'dash/img/blog/img08.png' %}">
+			  <div class="article-image" data-background="{{ course.image.url }}">
 			  </div>
 			  <div class="article-title">
-				<h2><a href="#">{{ course.name }}</a></h2>
+				<h2><a href="{% url 'course_details' course.id %}">{{ course.name }}</a></h2>
 			  </div>
 			</div>
 			<div class="article-details">
