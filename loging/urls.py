@@ -68,6 +68,11 @@ urlpatterns = [
     path('results/', views.quiz_result, name='quiz_result'),  # View quiz results
     path('result/', views.results, name='results'),
 
+    path('enter_cat_scores/<int:cat_id>/', views.enter_cat_scores, name="marks_entry"),
+    path('create_cat/', views.create_cat, name="create_cat"),
+    path('cat_list/', views.cat_list_view, name="cat_list_view"),
+    path('cat_results/', views.marks_view, name="marks_view"),
+
     # Edit quiz URL
     path('quiz/edit/<int:quiz_id>/', views.edit_quiz, name='edit_quiz'),
 

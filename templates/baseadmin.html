@@ -14,6 +14,9 @@
 
 <!-- General CSS Files -->
 <link rel="stylesheet" href="{% static 'dash/css/app.min.css' %}">
+<link rel="stylesheet" href="{% static 'dash/bundles/datatables/datatables.min.css' %}">
+<link rel="stylesheet" href="{% static 'dash/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css' %}">
+<link rel="stylesheet" href="{% static 'dash/bundles/datatables/Select-1.2.4/css/select.bootstrap4.min.css' %}">
 
 <!-- Template CSS (Override Bootstrap and other general styles) -->
 <link rel="stylesheet" href="{% static 'dash/css/style.css' %}">
@@ -388,6 +391,12 @@
             <li class="dropdown active">
             <a href="{% url 'create_quiz' %}" class="nav-link"><i data-feather="plus-square"></i><span>Create Quiz</span></a>
             </li>
+            <li class="dropdown active">
+            <a href="{% url 'create_cat' %}" class="nav-link"><i data-feather="plus-square"></i><span>Add CAT Marks</span></a>
+            </li>
+            <li class="dropdown active">
+            <a href="{% url 'cat_list_view' %}" class="nav-link"><i data-feather="plus-square"></i><span> CAT Marks Forms</span></a>
+            </li>
 
             <li class="menu-header">Administration</li>
             <li class="dropdown active">
@@ -542,6 +551,9 @@
             <li class="dropdown active">
             <a href="{% url 'results' %}" class="nav-link"><i data-feather="file"></i><span>ExamReport</span></a>
             </li>
+            <li class="dropdown active">
+            <a href="{% url 'marks_view' %}" class="nav-link"><i data-feather="file"></i><span>CAT Results</span></a>
+            </li>
             <li class="menu-header">Reports & Settings</li>
             <li class="dropdown active">
               <a href="{% url 'blogs' %}" class="nav-link"><i data-feather="file-text"></i><span>Blogs</span></a>
@@ -633,6 +645,10 @@
 
 <!-- JS Libraries -->
 <script src="{% static 'dash/bundles/apexcharts/apexcharts.min.js' %}"></script>
+
+<script src="{% static 'dash/bundles/editable-table/mindmup-editabletable.js' %}"></script>
+<!-- Page Specific JS File -->
+<script src="{% static 'dash/js/page/editable-table.js' %}"></script>
 
 <!-- Page Specific JS File -->
 <script src="{% static 'dash/js/page/index.js' %}"></script>

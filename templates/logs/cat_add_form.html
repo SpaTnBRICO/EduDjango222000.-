@@ -1,0 +1,53 @@
+{% extends '../baseadmin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4>Existing CATs</h4>
+            <a href="{% url 'create_cat' %}" class="btn btn-primary btn-sm ml-auto">+ New CAT</a>
+          </div>
+          <div class="card-body">
+            {% if cats %}
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Title</th>
+                      <th>Unit</th>
+                      <th>Course</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for cat in cats %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ cat.title }}</td>
+                        <td>{{ cat.unit.name }}</td>
+                        <td>{{ cat.unit.course.name }}</td>
+                        <td>{{ cat.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                          <a href="{% url 'marks_entry' cat.id %}" class="btn btn-sm btn-info">Enter Marks</a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p>No CATs found.</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

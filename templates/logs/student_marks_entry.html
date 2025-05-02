@@ -1,0 +1,87 @@
+{% extends '../baseadmin.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<section class="section">
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4>{{ cat.unit.course.name }} {{ cat.title }} Marks Entry Form</h4>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="{% url 'marks_entry' cat.id %}" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                  <thead class="thead-light">
+                    <tr>
+                      <th>#</th>
+                      <th>Student Name</th>
+                      <th>Registration Number</th>
+                      <th>Marks</th>
+                      <th>Enter Mark</th>
+                      <th>Pdf doc</th>
+                      <th>DOC</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for student in students %}
+                    <tr>
+                      <td>{{ forloop.counter }}</td>
+                      <td class="align-middle text-dark">{{ student.first_name }} {{ student.last_name }}</td>
+                      <td class="align-middle text-dark">{{ student.registration_number }}</td>
+                      {% if existing_score %}
+                          <td class="align-middle text-dark">
+                          {{ existing_score|get_item:student.id|default:"None" }}
+                        </td>
+                      {% else %}
+                      <td class="align-middle text-dark">None</td>
+                      {% endif %}
+                      <td>
+                        <input 
+                          type="number" 
+                          name="score_{{ student.id }}" 
+                          class="form-control" 
+                          value="" 
+                          min="0" 
+                          max="100" 
+                          step="0.01"
+                        >
+                      </td>
+                      <td>
+                        <input 
+                          type="file" 
+                          name="doc_{{ student.id }}"
+                          accept="application/pdf"
+                        >
+                      </td>
+                      <td>
+                        {% with score=scores|get_item:student.id %}
+                          {% if score and score.attachment %}
+                            <a href="{{ score.attachment.url }}" target="_blank">Download</a><br>
+                          {% else %}
+                            <p>NO FILE</p>
+                          {% endif %}
+                        {% endwith %}
+                      </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                      <td colspan="3" class="text-center">No students found for this unit.</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <button type="submit" class="btn btn-primary mt-3">Submit Marks</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

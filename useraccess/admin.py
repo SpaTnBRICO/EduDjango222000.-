@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, CustomerUser, Student, Department, Course, StudentApp, Unit, CAT, Practical
+from .models import UserProfile, CustomerUser, Student, Department, Course, StudentApp, Unit, CAT, Practical, CATScore, PRACScore
 
 # Register your models here.
 admin.site.register(UserProfile)
@@ -11,3 +11,5 @@ admin.site.register(StudentApp)
 admin.site.register(Unit)
 admin.site.register(CAT)
 admin.site.register(Practical)
+admin.site.register(CATScore)
+admin.site.register(PRACScore)

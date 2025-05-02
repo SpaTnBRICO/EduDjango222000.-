@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
-from .models import UserProfile, CustomerUser, StudentApp
+from .models import UserProfile, CustomerUser, StudentApp, CAT, CATScore
 
 
 @receiver(post_save, sender=CustomerUser)
@@ -24,3 +24,13 @@ def delete_student_application(sender, instance, **kwargs):
     except StudentApp.DoesNotExist:
         print(f"No StudentApplication found for {instance.username}")
         # If no associated StudentApplication exists, do nothing
+
+@receiver(post_save, sender=CAT)
+def create_cat_scores_for_students(sender, instance, created, **kwargs):
+    if created:
+        students = StudentApp.objects.filter(course=instance.unit.course)
+        for student in students:
+            CATScore.objects.get_or_create(
+                cat=instance,
+                student=student
+            )

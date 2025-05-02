@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from useraccess.models import Course, Department, StudentApp, Teacher, UserProfile, CustomerUser, Unit
+from useraccess.models import Course, Department, StudentApp, Teacher, UserProfile, CustomerUser, Unit, CAT, CATScore
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import FeePayment, SiteLogo, GoogleFormAssignment, Tutorial, Notes, Quiz, Question, Answer, QuizAttempt, Contact, Reply, ComposeEmail, Event, Blog, News, Slider
@@ -39,6 +39,7 @@ def home(request):
         'news': news,
         })
 
+@login_required
 def create_slides(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
@@ -63,6 +64,7 @@ def create_slides(request):
         "user_profile": user_profile
         })
 
+@login_required
 def manage_slides(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     slides = Slider.objects.all()
@@ -71,6 +73,7 @@ def manage_slides(request):
         'user_profile': user_profile,
     })
 
+@login_required
 def create_logos(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
@@ -90,6 +93,7 @@ def create_logos(request):
         "user_profile": user_profile
         })
 
+@login_required
 def logo(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     logos = SiteLogo.objects.all()
@@ -99,6 +103,7 @@ def logo(request):
     })
 
 
+@login_required
 def set_active_logo(request, logo_id):
     logo_to_activate = get_object_or_404(SiteLogo, id=logo_id)
 
@@ -111,6 +116,7 @@ def set_active_logo(request, logo_id):
 
     return redirect('/logos/')
 
+@login_required
 def deactivate_logo(request, logo_id):
     logo_to_deactivate = get_object_or_404(SiteLogo, id=logo_id)
 
@@ -120,6 +126,7 @@ def deactivate_logo(request, logo_id):
 
     return redirect('/logos/')
 
+@login_required
 def delete_logo(request, logo_id):
     logo_to_activate = get_object_or_404(SiteLogo, id=logo_id)
 
@@ -133,6 +140,7 @@ def events(request):
         'eventss': eventss,
     })
 
+@login_required
 def create_events(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
@@ -175,6 +183,7 @@ def news_details(request, id):
         'news': news,
         })
 
+@login_required
 def create_news(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
@@ -210,6 +219,7 @@ def blog_details(request, id):
         'blog': blog,
         })
 
+@login_required
 def create_blogs(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
@@ -1543,3 +1553,78 @@ def edit_question(request, question_id):
             return redirect('/quiz_list/')  # Adjust the redirect as needed
 
     return render(request, 'logs/edit_question.html', {'question': question, 'answers': answers, 'user_profile': user_profile})
+
+
+@login_required
+def create_cat(request):
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        unit_id = request.POST.get('unit')
+        
+        if title and unit_id:
+            unit = Unit.objects.get(id=unit_id)
+            cat = CAT.objects.create(title=title, unit=unit)
+            return redirect(f'/cat_list/')  # Update this name to match your URLs
+
+    units = Unit.objects.all()
+    return render(request, 'logs/cat_env.html', {'units': units})
+
+
+@login_required
+def enter_cat_scores(request, cat_id):
+    cat = get_object_or_404(CAT, id=cat_id)
+    students = StudentApp.objects.filter(course=cat.unit.course)
+    scores = CATScore.objects.filter(cat=cat)
+
+    if request.method == 'POST':
+        for score_obj in scores:
+            student = score_obj.student
+            score = request.POST.get(f'score_{student.id}')
+            doc = request.FILES.get(f'doc_{student.id}')
+
+            if score:
+                score_obj.score = score
+
+            if doc and doc.content_type == 'application/pdf':
+                score_obj.attachment = doc
+
+            score_obj.save()
+
+        return redirect(f'/enter_cat_scores/{cat.id}/')
+
+    existing_score = {s.student_id: s.score for s in scores}
+
+    return render(request, 'logs/student_marks_entry.html', {
+        'cat': cat,
+        'students': students,
+        'scores': {s.student_id: s for s in scores},
+        'existing_score': existing_score,
+    })
+
+@login_required
+def cat_list_view(request):
+    cats = CAT.objects.all().order_by('-id')
+    return render(request, 'logs/cat_add_form.html', {'cats': cats})
+
+
+
+@login_required
+def marks_view(request):
+    # Get the logged-in user's StudentApp
+    student_app = get_object_or_404(StudentApp, registration_number=request.user.username)
+
+    # Get the student's CAT scores
+    cat_scores = CATScore.objects.filter(student=student_app).select_related('cat__unit__course').order_by('-id')
+
+    # Group CAT scores by course name
+    grouped_scores = {}
+    for score in cat_scores:
+        course_name = score.cat.unit.course.name
+        grouped_scores.setdefault(course_name, []).append(score)
+
+    return render(request, 'logs/cat_results.html', {
+        'grouped_scores': grouped_scores,
+        'student': student_app,
+    })
+
+

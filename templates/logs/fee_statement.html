@@ -16,7 +16,7 @@
                         {% if payments %}
                       <tr>
                         <th class="text-center">
-                          id
+                          #
                         </th>
                         <th>Generated At</th>
                         <th>Receipt Number</th>
@@ -30,7 +30,7 @@
                     <tbody>
                         {% for fee_statement in payments %}
                     <tr>
-                        <td>{{ fee_statement.id }}</td>
+                        <td>{{ forloop.counter }}</td>
                         <td>{{ fee_statement.payment_date }}</td>
                         <td>{{ fee_statement.receipt_number }}</td>
                         <td>{{ fee_statement.mode_of_payment }}</td>

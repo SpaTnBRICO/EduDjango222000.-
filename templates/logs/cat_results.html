@@ -1,0 +1,58 @@
+{% extends '../baseadmin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>My CAT Results</h4>
+            <span class="text-muted">Student: {{ student.first_name }} {{ student.last_name }}</span>
+          </div>
+          <div class="card-body">
+
+            {% for course_name, scores in grouped_scores.items %}
+              <h5 class="text-primary mt-5">{{ course_name }}</h5>
+
+              {% for score in scores %}
+              <div class="card mb-3 border-left-{{ forloop.counter|divisibleby:"3"|yesno:"primary,success,info" }} shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title mb-2">{{ score.cat.unit.name }}</h5>
+                  <h6 class="card-title mb-2">{{ score.cat.title }}</h6>
+                  <p class="mb-1">
+                    <strong>Score:</strong>
+                    {% if score.score %}
+                      {{ score.score }}
+                    {% else %}
+                      <span class="text-muted">Not yet entered</span>
+                    {% endif %}
+                  </p>
+                  <p class="mb-1">
+                    <strong>Attachment:</strong>
+                    {% if score.attachment %}
+                      <a href="{{ score.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                    {% else %}
+                      <span class="text-muted">No file uploaded</span>
+                    {% endif %}
+                  </p>
+                  <p class="text-muted mb-0">
+                    <small>Recorded on: {{ score.created_at|date:"M d, Y H:i" }}</small>
+                  </p>
+                </div>
+              </div>
+              {% endfor %}
+            {% endfor %}
+
+            <div class="alert alert-info mt-4">
+              End of CAT records.
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

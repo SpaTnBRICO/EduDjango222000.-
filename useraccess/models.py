@@ -19,6 +19,11 @@ from django.conf import settings
 import logging
 from django.shortcuts import get_object_or_404
 
+from PIL import Image, ImageOps
+import os
+from io import BytesIO
+from django.core.files import File
+
 #Email Stuff
 from django.core.mail import send_mail
 
@@ -383,7 +388,7 @@ class StudentApp(models.Model):
     def send_confirmation_email(self, user):
         token = PasswordResetTokenGenerator().make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        activation_link = f"http://192.168.3.134:8000/auth_access/activate/{uid}/{token}/"
+        activation_link = f"{settings.BASE_URL}/auth_access/activate/{uid}/{token}/"
         print(f"Activation Link: {activation_link}")
 
         try:
@@ -424,8 +429,9 @@ class StudentApp(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name} (Registration: {self.registration_number})"
 
+
 class Teacher(models.Model):
-    user = models.OneToOneField(CustomerUser, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.OneToOneField(CustomerUser, on_delete=models.CASCADE)
     id_number = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -466,7 +472,7 @@ class Teacher(models.Model):
     def send_confirmation_email(self, user):
         token = PasswordResetTokenGenerator().make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        activation_link = f"http://192.168.3.134:8000/auth_access/activate/{uid}/{token}/"
+        activation_link = f"{settings.BASE_URL}/auth_access/activate/{uid}/{token}/"
         print(f"Activation Link: {activation_link}")
 
         try:
@@ -508,19 +514,40 @@ class Teacher(models.Model):
 
 
 class CAT(models.Model):
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, blank=True)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='cats')
     title = models.CharField(max_length=50)
-    student = models.ForeignKey(StudentApp, on_delete=models.CASCADE, null=True, blank=True)
-    score = models.DecimalField(max_digits=50, decimal_places=2)
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.student.stud.username}'s CAT (Course: {self.unit.course.name}) (Unit: {self.unit.name})"
+        return f"{self.title} - {self.unit.name}"
+
+class CATScore(models.Model):
+    cat = models.ForeignKey(CAT, on_delete=models.CASCADE, related_name='catmark')
+    student = models.ForeignKey(StudentApp, on_delete=models.CASCADE)
+    attachment = models.FileField(upload_to='cats', null=True, blank=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+
+
+
+
+    def __str__(self):
+        return f"{self.student.registration_number}'s {self.cat.title} - {self.score}"
 
 class Practical(models.Model):
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, null=True, blank=True)
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='pracs')
     title = models.CharField(max_length=50)
-    student = models.ForeignKey(StudentApp, on_delete=models.CASCADE, null=True, blank=True)
-    score = models.DecimalField(max_digits=50, decimal_places=2)
+    is_approved = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.student.stud.username}'s Practical (Course: {self.unit.course.name}) (Unit: {self.unit.name})"
+        return f"{self.title} - {self.unit.name}"
+
+class PRACScore(models.Model):
+    prac = models.ForeignKey(Practical, on_delete=models.CASCADE, related_name='pracmark')
+    student = models.ForeignKey(StudentApp, on_delete=models.CASCADE)
+    attachment = models.FileField(upload_to='pracs', null=True, blank=True)
+    score = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.student.stud.username}'s {self.cat.title} - {self.score}"
