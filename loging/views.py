@@ -43,6 +43,9 @@ def home(request):
 
 @login_required
 def create_slides(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
         name = request.POST.get('title')
@@ -68,6 +71,9 @@ def create_slides(request):
 
 @login_required
 def manage_slides(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     slides = Slider.objects.all()
     return render(request, "logs/manage_slides.html", {
@@ -77,6 +83,9 @@ def manage_slides(request):
 
 @login_required
 def create_logos(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
         name = request.POST.get('title')
@@ -97,6 +106,9 @@ def create_logos(request):
 
 @login_required
 def logo(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     logos = SiteLogo.objects.all()
     return render(request, "logs/logo.html", {
@@ -107,6 +119,9 @@ def logo(request):
 
 @login_required
 def set_active_logo(request, logo_id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     logo_to_activate = get_object_or_404(SiteLogo, id=logo_id)
 
     # Deactivate all logos
@@ -120,6 +135,9 @@ def set_active_logo(request, logo_id):
 
 @login_required
 def deactivate_logo(request, logo_id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     logo_to_deactivate = get_object_or_404(SiteLogo, id=logo_id)
 
     # Activate the selected one
@@ -130,6 +148,9 @@ def deactivate_logo(request, logo_id):
 
 @login_required
 def delete_logo(request, logo_id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     logo_to_activate = get_object_or_404(SiteLogo, id=logo_id)
 
     # delete the selected one
@@ -144,6 +165,9 @@ def events(request):
 
 @login_required
 def create_events(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
         name = request.POST.get('title')
@@ -187,6 +211,9 @@ def news_details(request, id):
 
 @login_required
 def create_news(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == "POST":
         name = request.POST.get('title')
@@ -537,6 +564,9 @@ def email_read(request, id):
 
 @login_required
 def g_post_assignment(request):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user = request.user
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
@@ -567,6 +597,9 @@ def g_post_assignment(request):
 
 @login_required
 def delete_g_assignment(request, id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     assignment = GoogleFormAssignment.objects.get(id=id)
     assignment.delete()
     return redirect('/view_posted_assignments/')
@@ -619,6 +652,9 @@ def view_posted_assignments(request):
 # View for creating a new note
 @login_required
 def create_note(request):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
         # Handle the form submission
@@ -681,6 +717,9 @@ def view_posted_notes(request):
 
 @login_required
 def delete_notes(request, id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     notes = Notes.objects.get(id=id)
     notes.delete()
     return redirect('/notes/')
@@ -690,6 +729,9 @@ def delete_notes(request, id):
 # View for creating a new tutorial
 @login_required
 def create_tutorial(request):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method == 'POST':
         # Handle the form submission
@@ -752,12 +794,18 @@ def view_posted_tutorials(request):
 
 @login_required
 def delete_tutorial(request, id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     tut = Tutorial.objects.get(id=id)
     tut.delete()
     return redirect('/tutorial/')
 
 @login_required
 def view_departments(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     departments = Department.objects.all()
     user_profile = get_object_or_404(UserProfile, user=request.user)
     return render(request, 'logs/departments.html', {
@@ -767,18 +815,27 @@ def view_departments(request):
 
 @login_required
 def delete_course(request, id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     cos = Course.objects.get(id=id)
     cos.delete()
     return redirect('/courses/')
 
 @login_required
 def delete_department(request, id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     department = Department.objects.get(id=id)
     department.delete()
     return redirect('/departments/')
 
 @login_required
 def create_course(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     # Get all departments to populate the select box in the form
     departments = Department.objects.filter(is_tution=True)
     user_profile = get_object_or_404(UserProfile, user=request.user)
@@ -829,7 +886,10 @@ def create_course(request):
 
 @login_required
 def add_unit(request, id):
-    # Get all departments to populate the select box in the form
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+    # Get all courses to populate the select box in the form
     cos = Course.objects.get(id=id)
     if request.method == "POST":
         # Get form data
@@ -870,6 +930,9 @@ def add_unit(request, id):
 
 @login_required
 def edit_course(request, id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     # Get all departments to populate the select box in the form
     departments = Department.objects.filter(is_tution=True)
     coss = Course.objects.get(id=id)
@@ -915,6 +978,9 @@ def edit_course(request, id):
     })
 
 def create_department(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.method=="POST":
         title = request.POST.get('title')
@@ -938,6 +1004,9 @@ def create_department(request):
 
 
 def edit_department(request, id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     department = Department.objects.get(id=id)
     if request.method=="POST":
@@ -961,6 +1030,10 @@ def edit_department(request, id):
 
 @login_required
 def view_course(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+
     courses = Course.objects.all()
     user_profile = get_object_or_404(UserProfile, user=request.user)
     return render(request, 'logs/courses.html', {
@@ -1025,6 +1098,9 @@ def cos_apply(request, id):
 
 @login_required
 def course_details(request, course_id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     course = Course.objects.get(id=course_id)
     return render(request, 'logs/course_details.html', {
@@ -1034,6 +1110,9 @@ def course_details(request, course_id):
 
 @login_required
 def all_students(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     students = StudentApp.objects.all()
     user_profile = get_object_or_404(UserProfile, user=request.user)
     return render(request, 'logs/all_students.html', {
@@ -1042,6 +1121,9 @@ def all_students(request):
         })
 @login_required
 def student_details(request, student_id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     student = StudentApp.objects.get(id=student_id)
     return render(request, 'logs/student_details.html', {
@@ -1050,6 +1132,9 @@ def student_details(request, student_id):
         })
 @login_required
 def teacher_list(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     # Retrieve all teacher objects from the database
     teachers = Teacher.objects.all()
     user_profile = get_object_or_404(UserProfile, user=request.user)
@@ -1059,6 +1144,9 @@ def teacher_list(request):
 
 @login_required
 def fee_payment_view(request):
+    if not request.user.is_student:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     """
     View to handle fee payment through M-Pesa.
     """
@@ -1116,6 +1204,9 @@ def fee_payment_view(request):
 
 @login_required
 def GenerateFeeStatement(request):
+    if not request.user.is_student:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     # Get the logged-in user, assuming the user is a student
     student = get_object_or_404(StudentApp, registration_number=request.user)
     user_profile = get_object_or_404(UserProfile, user=request.user)
@@ -1179,6 +1270,9 @@ from django.shortcuts import get_object_or_404
 
 @login_required
 def payment_receipt_pdf(request, payment_id):
+    if not request.user.is_student:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     # Fetch the specific payment instance by payment_id
     payment = get_object_or_404(FeePayment, id=payment_id)
     student = payment.student
@@ -1405,6 +1499,10 @@ def quiz_list(request):
 
 @login_required
 def delete_quiz(request, id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
+
     q = Quiz.objects.get(id=id)
     q.delete()
     return redirect('/quiz_list/')
@@ -1452,12 +1550,20 @@ def take_quiz(request, quiz_id):
 
 @login_required
 def quiz_result(request):
+    if not request.user.is_student:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+
     user_profile = get_object_or_404(UserProfile, user=request.user)
     attempts = QuizAttempt.objects.filter(registration_number=request.user).last()
     return render(request, 'logs/quiz_result.html', {'attempts': attempts, 'user_profile': user_profile,})
 
 @login_required
 def results(request):
+    if not request.user.is_student:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+
     user_profile = get_object_or_404(UserProfile, user=request.user)
     student = StudentApp.objects.filter(registration_number=request.user.username).first()
     print(f'student {student}')
@@ -1564,6 +1670,10 @@ def is_pdf(file):
     return file and mimetypes.guess_type(file.name)[0] == 'application/pdf'
 
 def create_cat(request):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+
     if request.method == 'POST':
         title = request.POST.get('title')
         unit_id = request.POST.get('unit')
@@ -1588,13 +1698,15 @@ def create_cat(request):
 
         if errors:
             for error in errors:
-                messages.error(request, error)
+                messages.warning(request, error)
         else:
             unit = get_object_or_404(Unit, id=unit_id)
 
             cat = CAT.objects.create(
                 title=title,
-                unit=unit
+                unit=unit,
+                created_by=request.user.username,
+                created_at=timezone.now()
             )
 
             # Save optional files only if provided
@@ -1617,6 +1729,9 @@ def create_cat(request):
 
 @login_required
 def get_units_by_course(request):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.warning(request, "You don't have permission to view this page.")
+        return redirect('home')
     course_id = request.GET.get('course_id')
     units = Unit.objects.filter(course_id=course_id).values('id', 'name')
     return JsonResponse(list(units), safe=False)
@@ -1626,6 +1741,10 @@ def get_units_by_course(request):
 
 @login_required
 def enter_cat_scores(request, cat_id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+
     cat = get_object_or_404(CAT, id=cat_id)
     students = StudentApp.objects.filter(course=cat.unit.course)
     scores = CATScore.objects.filter(cat=cat)
@@ -1657,13 +1776,23 @@ def enter_cat_scores(request, cat_id):
 
 @login_required
 def cat_list_view(request):
-    cats = CAT.objects.all().order_by('-id')
+    cats = []
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+    if request.user.is_admin:
+        cats = CAT.objects.all().order_by('-id')
+    elif request.user.is_admin:
+        cats = CAT.objects.get(created_by=request.user.username).order_by('-id')
     return render(request, 'logs/cat_add_form.html', {'cats': cats})
 
 
 
 @login_required
 def marks_view(request):
+    if not request.user.is_student:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     # Get the logged-in user's StudentApp
     student_app = get_object_or_404(StudentApp, registration_number=request.user.username)
 
@@ -1672,7 +1801,7 @@ def marks_view(request):
 
     # Group CAT scores by course name
     grouped_scores = {}
-    for score in cat_scores:
+    for score in cat_scores.cat.is_approved:
         course_name = score.cat.unit.course.name
         grouped_scores.setdefault(course_name, []).append(score)
 
@@ -1682,3 +1811,15 @@ def marks_view(request):
     })
 
 
+def cat_approval(request, cat_id):
+    cat = CAT.objects.get(id=cat_id)
+
+    if not (cat.attendance_sheet and cat.mark_sheet and cat.pc_waiting):
+        messages.warning(request, "Attendance Sheet, Mark Sheet, and PC Waiting Should be provided to Approve the Results.")
+        return redirect('/cat_list/')
+
+    else:
+        cat.is_approved = True
+        cat.save()
+        messages.success(request, "Results Approved Successfully")
+        return redirect('/cat_list/')

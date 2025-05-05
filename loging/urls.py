@@ -73,6 +73,7 @@ urlpatterns = [
     path('ajax/get-units/', views.get_units_by_course, name='get_units_by_course'),
     path('cat_list/', views.cat_list_view, name="cat_list_view"),
     path('cat_results/', views.marks_view, name="marks_view"),
+    path('cat_approval/<int:cat_id>/', views.cat_approval, name="cat_approval"),
 
     # Edit quiz URL
     path('quiz/edit/<int:quiz_id>/', views.edit_quiz, name='edit_quiz'),

@@ -21,8 +21,9 @@
                       <th>Title</th>
                       <th>Unit</th>
                       <th>Course</th>
-                      <th>Created</th>
+                      <th>Approval</th>
                       <th>Actions</th>
+                      <th>View/Enter</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -32,7 +33,15 @@
                         <td>{{ cat.title }}</td>
                         <td>{{ cat.unit.name }}</td>
                         <td>{{ cat.unit.course.name }}</td>
-                        <td><a href="#" class="btn btn-sm btn-success">Approved</a>
+                        <td>
+                          {% if cat.is_approved %}
+                          <div class="badge badge-success badge-shadow">Approved</div>
+                          {% else %}
+                          <div class="badge badge-danger badge-shadow">Pending...</div>
+                          {% endif %}
+                        </td>
+                        <td>
+                          <a href="{% url 'cat_approval' cat.id %}" class="btn btn-sm btn-success">Approve</a>
                         </td>
                         <td>
                           <a href="{% url 'marks_entry' cat.id %}" class="btn btn-sm btn-info">Enter Marks/View</a>

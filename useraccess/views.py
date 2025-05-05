@@ -173,9 +173,9 @@ def otp_view_activate_account(request):
                     del request.session['otp_secret_key']
                     del request.session['otp_valid_date']
 
-                    # Show success message and redirect to login page
+                    # Show success message and redirect to signup page
                     messages.success(request, "Account activated successfully. You can login now.")
-                    return redirect('/auth_access/signin/')
+                    return redirect('/auth_access/signup/')
                 else:
                     # Invalid OTP entered by the user
                     messages.error(request, "Invalid OTP! Try again.")
@@ -200,7 +200,7 @@ def otp_view_activate_account(request):
     # Render the OTP activation page
     return render(request, "otp_view_activate_account.html", {})
 # User Login View
-#@redirect_if_authenticated
+@redirect_if_authenticated
 def user_login(request):
     """
     Handles the user login process, including OTP generation.
@@ -516,6 +516,9 @@ def profile(request):
 # View to display the user profile
 @login_required
 def user_profile(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     # Ensure that 'request.user' is a student
     if request.user.is_student:
         student = request.user
@@ -646,6 +649,9 @@ def UserProfileUpdate(request):
 # Export user profiles to a CSV file
 @login_required
 def profile_csv(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     """
     Exports all user profiles to a CSV file for download.
     """
@@ -669,6 +675,9 @@ def profile_csv(request):
 # Confirm Letter View - Handles creating admission letters for students
 @login_required
 def confirm_letter(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     """
     Handles the creation of an admission letter for students.
     Accepts POST requests with student details and saves the student record.
@@ -715,6 +724,9 @@ def confirm_letter(request):
 # Export admission letters to a CSV file
 @login_required
 def letter_csv(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     """
     Exports all admission letters (student records) to a CSV file for download.
     """
@@ -760,6 +772,9 @@ def ShowUsers(request):
 
 @login_required
 def update_user(request, id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     if request.user.is_admin:
         d = CustomerUser.objects.get(id=id)
@@ -916,6 +931,9 @@ def view_full_profile(request, id):
 # View to handle course application
 @login_required
 def apply_for_course(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     if request.method == 'POST':
         # Extract data from the form
         student_id = request.POST['student_id']
@@ -1014,6 +1032,9 @@ def apply_for_cos(request):
 
 @login_required
 def add_teacher(request):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     if request.method == 'POST':
         # Extract data from the form
         id_number = request.POST['id_number']
@@ -1096,6 +1117,9 @@ class ActivateAccountView(View):
 # Student Dashboard View (only accessible after login)
 @login_required
 def student_dashboard(request):
+    if not request.user.is_student:
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
     user_profile = get_object_or_404(UserProfile, user=request.user)
     student = request.user  # Assuming 'request.user' is a logged-in student (StudentApp)
     

@@ -20,7 +20,19 @@
                 <div class="author-box-name">
                   <a href="#">{{user.username}}</a>
                 </div>
+                {% if request.user.is_superuser %}
                 <div class="author-box-job">Web Developer</div>
+                {% elif request.user.is_admin %}
+                <div class="author-box-job">Admin</div>
+                {% elif request.user.is_teacher %}
+                <div class="author-box-job">Instructor</div>
+                {% elif request.user.is_employee %}
+                <div class="author-box-job">Staff</div>
+                {% elif request.user.is_customer %}
+                <div class="author-box-job">Customer</div>
+                {% elif request.user.is_student %}
+                <div class="author-box-job">Student</div>
+                {% endif %}
               </div>
               <div class="text-center">
                 <div class="author-box-description">

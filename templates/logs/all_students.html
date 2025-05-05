@@ -21,7 +21,7 @@
                         <th>ID Number</th>
                         <th>Email</th>
                         <th>Course</th>
-                        <th>Approved</th>
+                        <th>Approval</th>
                         <th>More Details</th>
                       </tr>
                     </thead>
@@ -41,8 +41,8 @@
                         </td>
                         <td>{{ student.course.name }}</td>
                         <td>
-                            {% if student.is_approved %} <div class="badge badge-success badge-shadow">Yes</div>
-                             {% else %} <div class="badge badge-danger badge-shadow">No</div> {% endif %}
+                            {% if student.is_approved %} <div class="badge badge-success badge-shadow">Approved</div>
+                             {% else %} <div class="badge badge-danger badge-shadow">Pending...</div> {% endif %}
                           
                         </td>
                         <td><a href="{% url 'student_details' student.id %}" class="btn btn-primary">Details</a></td>

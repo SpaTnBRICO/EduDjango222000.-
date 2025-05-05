@@ -431,7 +431,7 @@ class StudentApp(models.Model):
 
 
 class Teacher(models.Model):
-    user = models.OneToOneField(CustomerUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomerUser, on_delete=models.CASCADE, null=True, blank=True)
     id_number = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -516,10 +516,13 @@ class Teacher(models.Model):
 class CAT(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE, related_name='cats')
     title = models.CharField(max_length=50)
+    created_by = models.CharField(max_length=50, null=True, blank=True)
     attendance_sheet = models.FileField(upload_to='test_attendance/cats/', null=True, blank=True)
     mark_sheet = models.FileField(upload_to='marksheets/cats/', null=True, blank=True)
     pc_waiting = models.FileField(upload_to='pc_waiting/cats/', null=True, blank=True)
     is_approved = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(editable=False, blank=True, null=True )
     
 
     def __str__(self):
