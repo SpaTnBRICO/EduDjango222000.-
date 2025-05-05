@@ -6,12 +6,13 @@ from django.views import View
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+
 import csv
 import pyotp
 from datetime import datetime
 from django.template.loader import render_to_string  # <-- Add this import here
-from .models import CustomerUser, Student, UserProfile, Course, StudentApp, Teacher, Department
+from .models import CustomerUser, Student, UserProfile, Course, StudentApp, Teacher, Department, Level
 from loging.models import Contact
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -32,6 +33,9 @@ from django.conf import settings
 #Email Sending stuff
 from django.core.mail import send_mail
 from django.contrib.sites.shortcuts import get_current_site
+
+from django.contrib.auth.hashers import make_password
+from django.db import transaction
 
 
 
@@ -929,21 +933,21 @@ def view_full_profile(request, id):
 
 
 # View to handle course application
-@login_required
 def apply_for_course(request):
     if not request.user.is_admin:
         messages.error(request, "You don't have permission to view this page.")
         return redirect('home')
+
     if request.method == 'POST':
-        # Extract data from the form
         student_id = request.POST['student_id']
         first_name = request.POST['first_name']
         last_name = request.POST['last_name']
         email = request.POST['email']
         phone_number = request.POST['phone_number']
         course_id = request.POST['course_id']
+        level_id = request.POST.get('level_id')
 
-
+        # Validations
         if StudentApp.objects.filter(student_id=student_id).exists():
             messages.warning(request, "The identification number provided is already registered")
             return redirect('/auth_access/apply/')
@@ -951,14 +955,14 @@ def apply_for_course(request):
         if CustomerUser.objects.filter(email=email).exists():
             messages.warning(request, "The email address provided is already registered")
             return redirect('/auth_access/apply/')
-        
+
         if UserProfile.objects.filter(phone_number=phone_number).exists():
-            messages.warning(request, "The phone_number provided is already registered")
+            messages.warning(request, "The phone number provided is already registered")
             return redirect('/auth_access/apply/')
 
-        # Get the course based on the selected course ID
         course = Course.objects.get(id=course_id)
-        
+        level = Level.objects.get(id=level_id) if level_id else None
+
         # Create a StudentApplication object with the form data
         application = StudentApp(
             student_id=student_id,
@@ -966,19 +970,37 @@ def apply_for_course(request):
             last_name=last_name,
             email=email,
             course=course,
+            level=level,
             phone_number=phone_number
         )
         application.save()  # This triggers the generation of the registration number
         
         # After saving the application, create the user account for the student
         application.create_user_account()
-        
-        return redirect('apply_success')  # Redirect to success page after the application is submitted
-    
-    # Retrieve all available courses to show in the form
-    courses = Course.objects.all()
+
+        return redirect('apply_success')
+
+    departments = Department.objects.all()
     user_profile = get_object_or_404(UserProfile, user=request.user)
-    return render(request, 'apply_for_course.html', {'courses': courses, 'user_profile':user_profile})
+    return render(request, 'apply_for_course.html', {
+        'departments': departments,
+        'user_profile': user_profile,
+    })
+
+# View to fetch courses based on department
+def get_courses_by_department(request, department_id):
+    try:
+        courses = Course.objects.filter(department_id=department_id)
+        course_list = [{"id": course.id, "name": course.name} for course in courses]
+        return JsonResponse({"courses": course_list})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+# View to fetch levels based on course
+def get_levels_by_course(request, course_id):
+    levels = Level.objects.filter(course_id=course_id)
+    level_list = [{"id": level.id, "name": level.name} for level in levels]
+    return JsonResponse({"levels": level_list})
 
 
 # View to handle course application

@@ -1,6 +1,7 @@
 from django.urls import path
 from .import views
 
+
 urlpatterns = [
     path('',views.home, name="home"),
     path('create_slides/',views.create_slides, name="create_slides"),
@@ -74,6 +75,7 @@ urlpatterns = [
     path('cat_list/', views.cat_list_view, name="cat_list_view"),
     path('cat_results/', views.marks_view, name="marks_view"),
     path('cat_approval/<int:cat_id>/', views.cat_approval, name="cat_approval"),
+    path('cat_submission/<int:cat_id>/', views.cat_submission, name="cat_submission"),
 
     # Edit quiz URL
     path('quiz/edit/<int:quiz_id>/', views.edit_quiz, name='edit_quiz'),
@@ -85,4 +87,11 @@ urlpatterns = [
     path('accesstoken/', views.get_access_token, name='get_access_token'),
     path('stkpush/', views.initiate_stk_push, name='initiate_stk_push'),
     path('query/', views.query_stk_status, name='query_stk_status'),
+
+
+    
+
+
+    
 ]
+

@@ -287,8 +287,18 @@ class Course(models.Model):
     def __str__(self):
         return self.name
 
+class Level(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='levels')
+    name = models.CharField(max_length=15, blank=True, null=True)
+    modified_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def __str__(self):
+        return f"{self.name}--{self.course.name}"
+
 class Unit(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='units')
+    level = models.ForeignKey(Level, on_delete=models.CASCADE, blank=True, null=True, related_name='unit_level')
     name = models.CharField(max_length=15, blank=True, null=True)
     teacher = models.CharField(max_length=15, blank=True, null=True)
     unit_code = models.CharField(max_length=15, unique=True, blank=True, null=True, editable=False)
@@ -322,19 +332,19 @@ def default_user_instance():
     # Replace this with the logic to return a default user (e.g., the first user in the DB)
     return CustomerUser.objects.first()
 
-# Student Application Model
 class StudentApp(models.Model):
-    stud = models.OneToOneField(CustomerUser, on_delete=models.CASCADE, null=True, blank=True)
+    stud = models.OneToOneField(CustomerUser, on_delete=models.CASCADE, blank=True, null=True)
     phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True)
     student_id = models.CharField(max_length=50, unique=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.EmailField()
     is_approved = models.BooleanField(default=False)
-    total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True, blank=True, editable=False)
-    total_fees = models.DecimalField(max_digits=10, decimal_places=2, default=0, null=True, blank=True, editable=False)
+    total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), editable=False)
+    total_fees = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), editable=False)
     remaining_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='students')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='students')
+    level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='levels', null=True, blank=True)
     application_year = models.IntegerField(default=timezone.now().year, editable=False)
     registration_number = models.CharField(max_length=50, blank=True, null=True, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -344,29 +354,29 @@ class StudentApp(models.Model):
         course_code = self.course.code.upper()
         year = str(self.application_year)
         random_suffix = ''.join(random.choices(string.digits, k=5))
-        self.registration_number = f'{department_code}/{course_code}/{random_suffix}/{year}'
 
-        while StudentApp.objects.filter(registration_number=self.registration_number).exists():
+        reg_num = f'{department_code}/{course_code}/{random_suffix}/{year}'
+
+        # Ensure uniqueness
+        while StudentApp.objects.filter(registration_number=reg_num).exists():
             random_suffix = ''.join(random.choices(string.digits, k=5))
-            self.registration_number = f'{department_code}/{course_code}/{random_suffix}/{year}'
+            reg_num = f'{department_code}/{course_code}/{random_suffix}/{year}'
+
+        self.registration_number = reg_num
 
     def save(self, *args, **kwargs):
         if not self.registration_number:
             self.generate_registration_number()
 
-        # Ensure total_paid, total_fees, and remaining_balance are not None
+        # Set default fee fields if needed
         if self.total_paid is None:
             self.total_paid = Decimal('0.00')
 
-        if self.total_fees is None:
-            self.total_fees = Decimal('0.00')
+        if self.total_fees is None or self.total_fees == Decimal('0.00'):
+            self.total_fees = self.course.price
 
-        # Ensure that we set the course price for total_fees and remaining_balance
-        if self.course:
-            if self.total_fees == Decimal('0.00'):
-                self.total_fees = self.course.price  # Set total_fees to the course price
-            if self.remaining_balance is None:  # Only set remaining_balance if it's None
-                self.remaining_balance = self.course.price  # Set remaining_balance to course price
+        if self.remaining_balance is None:
+            self.remaining_balance = self.total_fees
 
         super().save(*args, **kwargs)
 
@@ -380,54 +390,50 @@ class StudentApp(models.Model):
         user.is_active = False
         user.save()
 
+        # Link the user to the student instance
+        self.stud = user
+        self.save(update_fields=['stud'])  # Save only the user field
+
         user_profile = user.userprofile  # Access the profile created by the signal
         user_profile.phone_number = self.phone_number
         user_profile.save()  # Save updated phone number
         self.send_confirmation_email(user)
 
     def send_confirmation_email(self, user):
-        token = PasswordResetTokenGenerator().make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        activation_link = f"{settings.BASE_URL}/auth_access/activate/{uid}/{token}/"
-        print(f"Activation Link: {activation_link}")
-
         try:
-            # Retrieve the user profile
-            user_profile = get_object_or_404(UserProfile, user=user)
-            email_address = user_profile.user.email  # Ensure the email is available
+            token = PasswordResetTokenGenerator().make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            activation_link = f"{settings.BASE_URL}/auth_access/activate/{uid}/{token}/"
+            print(activation_link)
 
+            email_address = user.email
             if not email_address:
-                logger.error("Email address is missing.")
+                logger.error("Missing user email.")
                 return
 
-            # Prepare the email content
-            subject = f"Congratulations on Your Successful Registration for {self.course} Course"
+            subject = f"Your Registration for {self.course} is Successful!"
             message = (
                 f"Dear {user.first_name} {user.last_name},\n\n"
-                f"Congratulations! Your application for the {self.course} course in the "
+                f"Congratulations! Your application for the {self.course.name} course in the "
                 f"{self.course.department.name} Department has been successfully processed.\n\n"
                 f"Your registration number is: {self.registration_number}\n\n"
-                f"To access the student dashboard, use your registration number as your username "
-                f"and the identification number you provided as your password.\n\n"
-                f"To activate your account, click the link below:\n"
-                f"{activation_link}\n\n"
-                f"Should you have any questions, contact us.\n\n"
+                f"Login Info:\n"
+                f" - Username: {self.registration_number}\n"
+                f" - Password: Your student ID\n\n"
+                f"Activate your account here:\n{activation_link}\n\n"
+                f"If you need help, contact the admissions team.\n\n"
                 f"Best regards,\n"
                 f"TechSols Admissions Team"
             )
-            from_email = settings.DEFAULT_FROM_EMAIL  # From email address (configured in settings.py)
-            recipient_list = [email_address]  # List of recipient emails
 
-            # Send the email
-            send_mail(subject, message, from_email, recipient_list)
-
-            logger.info("Email sent successfully.")
+            send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [email_address])
+            logger.info("Registration email sent successfully.")
 
         except Exception as e:
-            logger.error(f"Failed to send email: {e}")
+            logger.error(f"Error sending registration email: {e}")
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} (Registration: {self.registration_number})"
+        return f"{self.first_name} {self.last_name} (Reg: {self.registration_number})"
 
 
 class Teacher(models.Model):
@@ -467,6 +473,11 @@ class Teacher(models.Model):
         user.is_teacher = True
         user.is_active = False
         user.save()
+
+        # Link the user to the teacher instance
+        self.user = user
+        self.save(update_fields=['user'])  # Save only the user field
+
         self.send_confirmation_email(user)
 
     def send_confirmation_email(self, user):
@@ -520,6 +531,7 @@ class CAT(models.Model):
     attendance_sheet = models.FileField(upload_to='test_attendance/cats/', null=True, blank=True)
     mark_sheet = models.FileField(upload_to='marksheets/cats/', null=True, blank=True)
     pc_waiting = models.FileField(upload_to='pc_waiting/cats/', null=True, blank=True)
+    is_submitted = models.BooleanField(default=False)
     is_approved = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(editable=False, blank=True, null=True )

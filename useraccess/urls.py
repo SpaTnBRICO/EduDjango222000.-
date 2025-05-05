@@ -31,6 +31,10 @@ urlpatterns = [
     #########
     # View for applying to a course
     path('apply/', views.apply_for_course, name='apply_for_course'),
+    # These are the dynamic routes for fetching courses and levels
+    path('get-courses/<int:department_id>/', views.get_courses_by_department, name='get_courses'),
+    path('get-levels/<int:course_id>/', views.get_levels_by_course, name='get_levels'),
+    
     path('add_teacher/', views.add_teacher, name='add_teacher'),
     
     # View for successful application submission

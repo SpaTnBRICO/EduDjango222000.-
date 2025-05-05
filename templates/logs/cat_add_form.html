@@ -7,6 +7,14 @@
     <div class="row">
       <div class="col-12">
         <div class="card">
+          {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
           <div class="card-header">
             <h4>Existing CATs</h4>
             <a href="{% url 'create_cat' %}" class="btn btn-primary btn-sm ml-auto">+ New CAT</a>
@@ -21,8 +29,15 @@
                       <th>Title</th>
                       <th>Unit</th>
                       <th>Course</th>
+                      <th>Submission</th>
                       <th>Approval</th>
+                      {% if request.user.is_teacher %}
+                      <th>Submission</th>
+                      {% endif %}
+
+                      {% if request.user.is_admin %}
                       <th>Actions</th>
+                      {% endif %}
                       <th>View/Enter</th>
                     </tr>
                   </thead>
@@ -34,15 +49,29 @@
                         <td>{{ cat.unit.name }}</td>
                         <td>{{ cat.unit.course.name }}</td>
                         <td>
+                          {% if cat.is_submitted %}
+                          <div class="badge badge-success badge-shadow">Submitted</div>
+                          {% else %}
+                          <div class="badge badge-danger badge-shadow">Pending...</div>
+                          {% endif %}
+                        </td>
+                        <td>
                           {% if cat.is_approved %}
                           <div class="badge badge-success badge-shadow">Approved</div>
                           {% else %}
                           <div class="badge badge-danger badge-shadow">Pending...</div>
                           {% endif %}
                         </td>
+                        {% if request.user.is_teacher %}
+                        <td>
+                          <a href="{% url 'cat_submission' cat.id %}" class="btn btn-sm btn-success">Submit</a>
+                        </td>
+                        {% endif %}
+                        {% if request.user.is_admin%}
                         <td>
                           <a href="{% url 'cat_approval' cat.id %}" class="btn btn-sm btn-success">Approve</a>
                         </td>
+                        {% endif %}
                         <td>
                           <a href="{% url 'marks_entry' cat.id %}" class="btn btn-sm btn-info">Enter Marks/View</a>
                         </td>

@@ -1729,12 +1729,11 @@ def create_cat(request):
 
 @login_required
 def get_units_by_course(request):
-    if not (request.user.is_admin or request.user.is_teacher):
-        messages.warning(request, "You don't have permission to view this page.")
-        return redirect('home')
     course_id = request.GET.get('course_id')
     units = Unit.objects.filter(course_id=course_id).values('id', 'name')
     return JsonResponse(list(units), safe=False)
+
+
 
 
 
@@ -1782,8 +1781,8 @@ def cat_list_view(request):
         return redirect('home')
     if request.user.is_admin:
         cats = CAT.objects.all().order_by('-id')
-    elif request.user.is_admin:
-        cats = CAT.objects.get(created_by=request.user.username).order_by('-id')
+    elif request.user.is_teacher:
+        cats = CAT.objects.filter(created_by=request.user.username).order_by('-id')
     return render(request, 'logs/cat_add_form.html', {'cats': cats})
 
 
@@ -1812,14 +1811,33 @@ def marks_view(request):
 
 
 def cat_approval(request, cat_id):
+    if not request.user.is_admin:
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
     cat = CAT.objects.get(id=cat_id)
 
-    if not (cat.attendance_sheet and cat.mark_sheet and cat.pc_waiting):
-        messages.warning(request, "Attendance Sheet, Mark Sheet, and PC Waiting Should be provided to Approve the Results.")
+    if not (cat.attendance_sheet and cat.mark_sheet and cat.pc_waiting and cat.is_submitted):
+        messages.warning(request, "Exam marks have not yet been submitted by the Instructor.")
         return redirect('/cat_list/')
 
     else:
         cat.is_approved = True
         cat.save()
         messages.success(request, "Results Approved Successfully")
+        return redirect('/cat_list/')
+
+def cat_submission(request, cat_id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
+    cat = CAT.objects.get(id=cat_id)
+
+    if not (cat.attendance_sheet and cat.mark_sheet and cat.pc_waiting):
+        messages.warning(request, "Attendance Sheet, Mark Sheet, and PC Waiting Should be provided to Submit the Results.")
+        return redirect('/cat_list/')
+
+    else:
+        cat.is_submitted = True
+        cat.save()
+        messages.success(request, "Results Submitted Successfully")
         return redirect('/cat_list/')

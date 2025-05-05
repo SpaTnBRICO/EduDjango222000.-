@@ -104,7 +104,7 @@ WSGI_APPLICATION = 'logsinout.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':  'proj1oo',
+        'NAME':  'proj1',
         'USER': 'root',
         'PASSWORD': DBP,
         'PORT': '3306', 
