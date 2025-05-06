@@ -12,6 +12,11 @@
             <h4>{{ cat.title }} Marks Entry Form</h4>---
             <h4>COURSE: {{ cat.unit.course.name }}</h4>---
             <h4>UNIT: {{ cat.unit.name }}</h4>
+             <div class="mb-4">
+                <a href="{% url 'cat_list_view' %}" class="btn btn-primary btn-sm ml-auto">
+                  <i class="fas fa-arrow-left"></i> Back to CAT list
+                </a>
+              </div>
 
           </div>
           <div class="card-body">
@@ -26,7 +31,7 @@
                       <th>Registration Number</th>
                       <th>Marks</th>
                       <th>Enter Mark</th>
-                      <th>Pdf doc</th>
+                      <th>Marked Exam Paper</th>
                       <th>DOC</th>
                     </tr>
                   </thead>

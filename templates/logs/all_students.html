@@ -1,175 +1,125 @@
 {% extends '../baseadmin.html' %}
 {% load static %}
 {% block content %}
-    <section class="section">
-      <div class="section-body">
-        <div class="row">
-          <div class="col-12">
-            <div class="card">
-              <div class="card-header">
-                <h4>STUDENTS</h4>
-              </div>
-              <div class="card-body">
-                <div class="table-responsive">
-                  <table class="table table-striped" id="table-1">
-                    <thead>
-                      <tr>
-                        <th class="text-center">
-                          id
-                        </th>
-                        <th>Name</th>
-                        <th>ID Number</th>
-                        <th>Email</th>
-                        <th>Course</th>
-                        <th>Approval</th>
-                        <th>More Details</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                        {% if students %}
-                        {% for student in students %}
-                      <tr>
-                        <td>
-                          {{student.id}}
-                        </td>
-                        <td>{{ student.first_name }} {{ student.last_name }}</td>
-                        <td>
-                            {{ student.student_id }}
-                        </td>
-                        <td>
-                            {{ student.email }}
-                        </td>
-                        <td>{{ student.course.name }}</td>
-                        <td>
-                            {% if student.is_approved %} <div class="badge badge-success badge-shadow">Approved</div>
-                             {% else %} <div class="badge badge-danger badge-shadow">Pending...</div> {% endif %}
-                          
-                        </td>
-                        <td><a href="{% url 'student_details' student.id %}" class="btn btn-primary">Details</a></td>
-                      </tr>
-                      {% endfor %}
-                      {% else %}
-                      <tr>
-                        <td>
-                          1
-                        </td>
-                        <td>Create a mobile app</td>
-                        <td class="align-middle">
-                          <div class="progress progress-xs">
-                            <div class="progress-bar bg-success width-per-40">
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <img alt="image" src="assets/img/users/user-5.png" width="35">
-                        </td>
-                        <td>2018-01-20</td>
-                        <td>
-                          <div class="badge badge-success badge-shadow">Completed</div>
-                        </td>
-                        <td><a href="#" class="btn btn-primary">Detail</a></td>
-                      </tr>
-                          <p class="no-students">No students available at the moment.</p>
-                      {% endif %}
-                     
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <div class="settingSidebar">
-      <a href="javascript:void(0)" class="settingPanelToggle"> <i class="fa fa-spin fa-cog"></i>
-      </a>
-      <div class="settingSidebar-body ps-container ps-theme-default">
-        <div class=" fade show active">
-          <div class="setting-panel-header">Setting Panel
-          </div>
-          <div class="p-15 border-bottom">
-            <h6 class="font-medium m-b-10">Select Layout</h6>
-            <div class="selectgroup layout-color w-50">
-              <label class="selectgroup-item">
-                <input type="radio" name="value" value="1" class="selectgroup-input-radio select-layout" checked>
-                <span class="selectgroup-button">Light</span>
-              </label>
-              <label class="selectgroup-item">
-                <input type="radio" name="value" value="2" class="selectgroup-input-radio select-layout">
-                <span class="selectgroup-button">Dark</span>
-              </label>
-            </div>
-          </div>
-          <div class="p-15 border-bottom">
-            <h6 class="font-medium m-b-10">Sidebar Color</h6>
-            <div class="selectgroup selectgroup-pills sidebar-color">
-              <label class="selectgroup-item">
-                <input type="radio" name="icon-input" value="1" class="selectgroup-input select-sidebar">
-                <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-                  data-original-title="Light Sidebar"><i class="fas fa-sun"></i></span>
-              </label>
-              <label class="selectgroup-item">
-                <input type="radio" name="icon-input" value="2" class="selectgroup-input select-sidebar" checked>
-                <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-                  data-original-title="Dark Sidebar"><i class="fas fa-moon"></i></span>
-              </label>
-            </div>
-          </div>
-          <div class="p-15 border-bottom">
-            <h6 class="font-medium m-b-10">Color Theme</h6>
-            <div class="theme-setting-options">
-              <ul class="choose-theme list-unstyled mb-0">
-                <li title="white" class="active">
-                  <div class="white"></div>
-                </li>
-                <li title="cyan">
-                  <div class="cyan"></div>
-                </li>
-                <li title="black">
-                  <div class="black"></div>
-                </li>
-                <li title="purple">
-                  <div class="purple"></div>
-                </li>
-                <li title="orange">
-                  <div class="orange"></div>
-                </li>
-                <li title="green">
-                  <div class="green"></div>
-                </li>
-                <li title="red">
-                  <div class="red"></div>
-                </li>
-              </ul>
-            </div>
-          </div>
-          <div class="p-15 border-bottom">
-            <div class="theme-setting-options">
-              <label class="m-b-0">
-                <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-                  id="mini_sidebar_setting">
-                <span class="custom-switch-indicator"></span>
-                <span class="control-label p-l-10">Mini Sidebar</span>
-              </label>
-            </div>
-          </div>
-          <div class="p-15 border-bottom">
-            <div class="theme-setting-options">
-              <label class="m-b-0">
-                <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-                  id="sticky_header_setting">
-                <span class="custom-switch-indicator"></span>
-                <span class="control-label p-l-10">Sticky Header</span>
-              </label>
-            </div>
-          </div>
-          <div class="mt-4 mb-4 p-3 align-center rt-sidebar-last-ele">
-            <a href="#" class="btn btn-icon icon-left btn-primary btn-restore-theme">
-              <i class="fas fa-undo"></i> Restore Default
+
+<style>
+  .card-header h4 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #2d3e50;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  table.table {
+    width: 100%;
+    border-spacing: 0;
+    border-collapse: collapse;
+  }
+
+  table th {
+    background-color: #f6f9fc;
+    color: #495057;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 13px;
+  }
+
+  table td, table th {
+    vertical-align: middle !important;
+    padding: 12px 15px;
+  }
+
+  .table-striped tbody tr:nth-of-type(odd) {
+    background-color: #f9f9f9;
+  }
+
+  .table-striped tbody tr:hover {
+    background-color: #eef6ff;
+  }
+
+  .badge-shadow {
+    font-size: 13px;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+
+  .btn-primary {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+
+  .no-students {
+    color: #999;
+    text-align: center;
+    font-style: italic;
+    margin-top: 15px;
+  }
+</style>
+
+<section class="section">
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>STUDENTS</h4>
+            <a href="{% url 'apply_for_course' %}" class="btn btn-success">
+              <i class="fas fa-user-plus"></i> Enroll Student
             </a>
           </div>
-        </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-striped" id="table-1">
+                <thead>
+                  <tr>
+                    <th class="text-center">ID</th>
+                    <th>Name</th>
+                    <th>ID Number</th>
+                    <th>Email</th>
+                    <th>Course</th>
+                    <th>Approval</th>
+                    <th>More Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if students %}
+                    {% for student in students %}
+                      <tr>
+                        <td class="text-center">{{ student.id }}</td>
+                        <td>{{ student.first_name }} {{ student.last_name }}</td>
+                        <td>{{ student.student_id }}</td>
+                        <td>{{ student.email }}</td>
+                        <td>{{ student.course.name }}</td>
+                        <td>
+                          {% if student.is_approved %}
+                            <div class="badge badge-success badge-shadow">Approved</div>
+                          {% else %}
+                            <div class="badge badge-danger badge-shadow">Pending</div>
+                          {% endif %}
+                        </td>
+                        <td>
+                          <a href="{% url 'student_details' student.id %}" class="btn btn-primary btn-sm">Details</a>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  {% else %}
+                    <tr>
+                      <td colspan="7" class="text-center text-muted py-4">
+                        No students available at the moment.
+                      </td>
+                    </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div> <!-- /.table-responsive -->
+          </div> <!-- /.card-body -->
+        </div> <!-- /.card -->
       </div>
     </div>
+  </div>
+</section>
+
 {% endblock content %}

@@ -338,61 +338,33 @@
             <a href="{% url 'view_departments' %}" class="nav-link"><i data-feather="layers"></i><span>Departments</span></a>
             </li>
             <li class="dropdown active">
-              <a href="{% url 'create_department' %}" class="nav-link"><i data-feather="plus-circle"></i><span>Create Department</span></a>
-              </li>
-            <li class="dropdown active">
             <a href="{% url 'view_course' %}" class="nav-link"><i data-feather="book"></i><span>Courses</span></a>
             </li>
-            <li class="dropdown active">
-            <a href="{% url 'create_course' %}" class="nav-link"><i data-feather="plus-circle"></i><span>Create Course</span></a>
-            </li>
-
             <li class="menu-header">Student Management</li>
             <li class="dropdown active">
             <a href="{% url 'all_students' %}" class="nav-link"><i data-feather="user"></i><span>Students</span></a>
             </li>
-            <li class="dropdown active">
-            <a href="{% url 'apply_for_course' %}" class="nav-link"><i data-feather="edit-3"></i><span>Enroll a Student</span></a>
-            </li>
-
             <li class="menu-header">Instructors</li>
             <li class="dropdown active">
             <a href="{% url 'teacher_list' %}" class="nav-link"><i data-feather="users"></i><span>Instructors</span></a>
             </li>
-            <li class="dropdown active">
-            <a href="{% url 'add_teacher' %}" class="nav-link"><i data-feather="user-plus"></i><span>Add Instructor</span></a>
-            </li>
             <li class="menu-header">Assignments & Notes</li>
             <li class="dropdown active">
-            <a href="{% url 'g_post_assignment' %}" class="nav-link"><i data-feather="file-text"></i><span>Post Assignment</span></a>
+            <a href="{% url 'view_posted_assignments' %}" class="nav-link"><i data-feather="file"></i><span>Assignments</span></a>
             </li>
             <li class="dropdown active">
-            <a href="{% url 'view_posted_assignments' %}" class="nav-link"><i data-feather="file"></i><span>View Posted Assignments</span></a>
-            </li>
-            <li class="dropdown active">
-            <a href="{% url 'create_note' %}" class="nav-link"><i data-feather="edit"></i><span>Post Notes</span></a>
-            </li>
-            <li class="dropdown active">
-            <a href="{% url 'view_posted_notes' %}" class="nav-link"><i data-feather="file-text"></i><span>View Posted Notes</span></a>
+            <a href="{% url 'view_posted_notes' %}" class="nav-link"><i data-feather="file-text"></i><span>Notes</span></a>
             </li>
 
             <li class="menu-header">Tutorials</li>
+            
             <li class="dropdown active">
-            <a href="{% url 'create_tutorial' %}" class="nav-link"><i data-feather="play-circle"></i><span>Post Tutorial</span></a>
-            </li>
-            <li class="dropdown active">
-            <a href="{% url 'view_posted_tutorials' %}" class="nav-link"><i data-feather="video"></i><span>View Posted Tutorials</span></a>
+            <a href="{% url 'view_posted_tutorials' %}" class="nav-link"><i data-feather="video"></i><span>Tutorials</span></a>
             </li>
 
             <li class="menu-header">Quizzes</li>
             <li class="dropdown active">
             <a href="{% url 'quiz_list' %}" class="nav-link"><i data-feather="help-circle"></i><span>Quizzes</span></a>
-            </li>
-            <li class="dropdown active">
-            <a href="{% url 'create_quiz' %}" class="nav-link"><i data-feather="plus-square"></i><span>Create Quiz</span></a>
-            </li>
-            <li class="dropdown active">
-            <a href="{% url 'create_cat' %}" class="nav-link"><i data-feather="plus-square"></i><span>Add CAT Marks</span></a>
             </li>
             <li class="dropdown active">
             <a href="{% url 'cat_list_view' %}" class="nav-link"><i data-feather="plus-square"></i><span> CAT Marks Forms</span></a>

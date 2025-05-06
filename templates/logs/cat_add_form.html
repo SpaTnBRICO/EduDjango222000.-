@@ -31,9 +31,9 @@
                       <th>Course</th>
                       <th>Submission</th>
                       <th>Approval</th>
-                      {% if request.user.is_teacher %}
+                      
                       <th>Submission</th>
-                      {% endif %}
+                      
 
                       {% if request.user.is_admin %}
                       <th>Actions</th>
@@ -62,11 +62,11 @@
                           <div class="badge badge-danger badge-shadow">Pending...</div>
                           {% endif %}
                         </td>
-                        {% if request.user.is_teacher %}
+                        
                         <td>
                           <a href="{% url 'cat_submission' cat.id %}" class="btn btn-sm btn-success">Submit</a>
                         </td>
-                        {% endif %}
+                        
                         {% if request.user.is_admin%}
                         <td>
                           <a href="{% url 'cat_approval' cat.id %}" class="btn btn-sm btn-success">Approve</a>

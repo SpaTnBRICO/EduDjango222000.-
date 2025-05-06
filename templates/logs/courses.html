@@ -1,146 +1,93 @@
 {% extends '../baseadmin.html' %}
 {% load static %}
 {% block content %}
+
+<style>
+    .card-course {
+        border: none;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+        transition: 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .card-course:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+
+    .card-img-top {
+        background-size: cover;
+        background-position: center;
+        height: 180px;
+        border-top-left-radius: .25rem;
+        border-top-right-radius: .25rem;
+    }
+
+    .card-body h5 {
+        font-weight: 600;
+    }
+
+    .btn-block {
+        width: 100%;
+    }
+
+    .no-courses img {
+        width: 120px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+</style>
+
 <section class="section">
-	<h2 class="section-title">Courses</h2>
-	<div class="section-body">
-	  <div class="row">
-		{% if courses %}
-		{% for course in courses %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article card">
-			<div class="article-header">
-			  <div class="article-image" data-background="{{ course.image.url }}">
-			  </div>
-			  <div class="article-title">
-				<h2><a href="{% url 'course_details' course.id %}">{{ course.name }}</a></h2>
-			  </div>
-			</div>
-			<div class="article-details">
-				<p><strong>Price:</strong> ${{ course.price }}</p>
-				<p><strong>Period of Study:</strong> {{ course.period_of_study }} months</p>
-				<p><strong>Department:</strong> {{ course.department.name }}</p>
-			  <div class="article-cta">
-				<a href="{% url 'course_details' course.id %}" class="btn btn-success mb-3">View Details</a><br>
-				<a href="{% url 'edit_course' course.id %}" class="btn btn-primary mb-3">Edit</a><br>
-				<a href="{% url 'delete_course' course.id %}" class="btn btn-danger">Delete</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		{% endfor %}
-		{% else %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article">
-			<div class="article-header">
-			  <div class="article-image" data-background="{% static 'dash/img/blog/img04.png' %}">
-			  </div>
-			  <div class="article-title">
-				<h2><a href="#">The oddest place you will find photo studios</a></h2>
-			  </div>
-			</div>
-			<div class="article-details">
-			  <p>A don't spirit gathered two under, lights said. May Multiply seasons you'll spirit tree morning
-				hath first signs.</p>
-			  <div class="article-cta">
-				<a href="#" class="btn btn-primary">Read More</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		{% endif %}
-	  </div>
-	</div>
-  </section>
-  <div class="settingSidebar">
-	<a href="javascript:void(0)" class="settingPanelToggle"> <i class="fa fa-spin fa-cog"></i>
-	</a>
-	<div class="settingSidebar-body ps-container ps-theme-default">
-	  <div class=" fade show active">
-		<div class="setting-panel-header">Setting Panel
-		</div>
-		<div class="p-15 border-bottom">
-		  <h6 class="font-medium m-b-10">Select Layout</h6>
-		  <div class="selectgroup layout-color w-50">
-			<label class="selectgroup-item">
-			  <input type="radio" name="value" value="1" class="selectgroup-input-radio select-layout" checked>
-			  <span class="selectgroup-button">Light</span>
-			</label>
-			<label class="selectgroup-item">
-			  <input type="radio" name="value" value="2" class="selectgroup-input-radio select-layout">
-			  <span class="selectgroup-button">Dark</span>
-			</label>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <h6 class="font-medium m-b-10">Sidebar Color</h6>
-		  <div class="selectgroup selectgroup-pills sidebar-color">
-			<label class="selectgroup-item">
-			  <input type="radio" name="icon-input" value="1" class="selectgroup-input select-sidebar">
-			  <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-				data-original-title="Light Sidebar"><i class="fas fa-sun"></i></span>
-			</label>
-			<label class="selectgroup-item">
-			  <input type="radio" name="icon-input" value="2" class="selectgroup-input select-sidebar" checked>
-			  <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-				data-original-title="Dark Sidebar"><i class="fas fa-moon"></i></span>
-			</label>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <h6 class="font-medium m-b-10">Color Theme</h6>
-		  <div class="theme-setting-options">
-			<ul class="choose-theme list-unstyled mb-0">
-			  <li title="white" class="active">
-				<div class="white"></div>
-			  </li>
-			  <li title="cyan">
-				<div class="cyan"></div>
-			  </li>
-			  <li title="black">
-				<div class="black"></div>
-			  </li>
-			  <li title="purple">
-				<div class="purple"></div>
-			  </li>
-			  <li title="orange">
-				<div class="orange"></div>
-			  </li>
-			  <li title="green">
-				<div class="green"></div>
-			  </li>
-			  <li title="red">
-				<div class="red"></div>
-			  </li>
-			</ul>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <div class="theme-setting-options">
-			<label class="m-b-0">
-			  <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-				id="mini_sidebar_setting">
-			  <span class="custom-switch-indicator"></span>
-			  <span class="control-label p-l-10">Mini Sidebar</span>
-			</label>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <div class="theme-setting-options">
-			<label class="m-b-0">
-			  <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-				id="sticky_header_setting">
-			  <span class="custom-switch-indicator"></span>
-			  <span class="control-label p-l-10">Sticky Header</span>
-			</label>
-		  </div>
-		</div>
-		<div class="mt-4 mb-4 p-3 align-center rt-sidebar-last-ele">
-		  <a href="#" class="btn btn-icon icon-left btn-primary btn-restore-theme">
-			<i class="fas fa-undo"></i> Restore Default
-		  </a>
-		</div>
-	  </div>
-	</div>
-  </div>
+    <div class="page-header">
+        <h2 class="section-title text-primary mb-0">Courses</h2>
+        <a href="{% url 'create_course' %}" class="btn btn-success">
+            <i class="fas fa-plus mr-1"></i> Add Course
+        </a>
+    </div>
+
+    <div class="section-body">
+        <div class="row">
+            {% if courses %}
+                {% for course in courses %}
+                    <div class="col-12 col-sm-6 col-md-6 col-lg-3 mb-4">
+                        <div class="card card-course">
+                            <div class="card-img-top" style="background-image: url('{{ course.image.url }}');"></div>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title"><a href="{% url 'course_details' course.id %}">{{ course.name }}</a></h5>
+                                <p class="text-muted mb-1"><strong>Price:</strong> ${{ course.price }}</p>
+                                <p class="text-muted mb-1"><strong>Duration:</strong> {{ course.period_of_study }} months</p>
+                                <p class="text-muted mb-3"><strong>Department:</strong> {{ course.department.name }}</p>
+                                <div class="mt-auto">
+                                    <a href="{% url 'course_details' course.id %}" class="btn btn-sm btn-success btn-block mb-2">View Details</a>
+                                    <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-outline-primary btn-block mb-2">Edit</a>
+                                    <a href="{% url 'delete_course' course.id %}" class="btn btn-sm btn-outline-danger btn-block">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-12 text-center no-courses">
+                    <div class="card border-light shadow-sm">
+                        <div class="card-body py-5">
+                            <img src="{% static 'dash/img/empty.png' %}" alt="No courses" class="mb-4">
+                            <h5 class="card-title">No Courses Found</h5>
+                            <p class="card-text text-muted">Start by adding a new course to get started.</p>
+                            <a href="{% url 'create_course' %}" class="btn btn-primary mt-2">Add Your First Course</a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
 {% endblock content %}

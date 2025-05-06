@@ -1,209 +1,247 @@
 {% extends '../baseadmin.html' %}
 {% load static %}
 {% block content %}
+
+<!-- Custom CSS for the Page -->
+<style>
+  .article.card {
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    transition: all 0.3s ease-in-out;
+    overflow: hidden;
+  }
+
+  .article.card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+  }
+
+  .article-title h2 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #34395e;
+    margin-bottom: 0.25rem;
+  }
+
+  .article-details {
+    padding: 1rem;
+  }
+
+  .article-details p {
+    font-size: 0.875rem;
+    color: #6c757d;
+  }
+
+  .article-cta .btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    margin-bottom: 0.3rem;
+    transition: all 0.2s ease;
+  }
+
+  .article-cta .btn i {
+    margin-right: 4px;
+  }
+
+  .article-cta .btn:hover {
+    transform: scale(1.03);
+  }
+
+  .section-header {
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-header h2.section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+  }
+
+  .btn-primary, .btn-outline-primary {
+    box-shadow: 0 2px 6px rgba(0, 123, 255, 0.2);
+  }
+
+  .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+    border-color: #dc3545;
+  }
+
+  .article-image {
+    height: 150px;
+    background-size: cover !important;
+    background-position: center;
+    border-bottom: 1px solid #eee;
+  }
+
+  /* Responsive card spacing */
+  .article.card {
+    margin-bottom: 1.5rem;
+  }
+
+  /* Icon sizing consistency */
+  .fas {
+    vertical-align: middle;
+  }
+</style>
+
 <section class="section">
-	<h2 class="section-title">Courses</h2>
-	<div class="section-body">
-	  <div class="row">
-        {% if request.user.is_admin %}
-        {% for assignment in assigns %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article card">
-			<div class="article-header">
-			  <div class="article-image" data-background="{% static 'dash/img/blog/img08.png' %}">
-			  </div>
-			  <div class="article-title">
-				<h2><a href="#">{{ assignment.title }}</a></h2>
-			  </div>
-			</div>
-			<div class="article-details">
-				<p><strong>{{ assignment.course.name }}</strong> assignment posted by <strong>{{ assignment.user.last_name }} {{ assignment.user.first_name }}</strong></p>
-                <pre>posted <strong>{{ assignment.created_at|timesince }} ago</strong></pre>
-			  <div class="article-cta">
+  <h2 class="section-title">Assignments</h2>
+  {% if request.user.is_admin or request.user.is_teacher %}
+  <div class="mb-4">
+  <a href="{% url 'g_post_assignment' %}" class="btn btn-success">
+    <i class="fas fa-plus"></i> Post Assignment
+  </a>
+</div>
+{% endif %}
+  <div class="section-body">
+    <div class="row">
+      {% if request.user.is_admin %}
+      {% for assignment in assigns %}
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+          <article class="article card">
+            <div class="article-header">
+              <div class="article-image" data-background="{% static 'dash/img/blog/img08.png' %}">
+              </div>
+              <div class="article-title">
+                <h2><a href="#">{{ assignment.title }}</a></h2>
+              </div>
+            </div>
+            <div class="article-details">
+              <p><strong>{{ assignment.course.name }}</strong> assignment posted by <strong>{{ assignment.user.last_name }} {{ assignment.user.first_name }}</strong></p>
+              <pre>posted <strong>{{ assignment.created_at|timesince }} ago</strong></pre>
+              <div class="article-cta">
                 <a href="{{ assignment.link }}" class="btn btn-primary" target="_blank">View Assignment</a>
                 <a class="btn btn-outline-primary mt-2" href="#">Edit Assignment</a>
                 <a href="/delete_g_assignment/{{ assignment.id }}/" class="btn btn-outline-danger mt-2">Delete Assignment</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		
-		{% empty %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article">
-			
-			<div class="article-details">
-			  <p>No posted assignments</p>
-			  <div class="article-cta">
-				<a href="#" class="btn btn-primary">Read More</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		{% endfor %}
-		{% elif request.user.is_teacher %}
-        {% for assignment in assign %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article card">
-			<div class="article-header">
-			  <div class="article-image" data-background="{% static 'dash/img/blog/img08.png' %}">
-			  </div>
-			  <div class="article-title">
-				<h2><a href="#">{{ assignment.title }}</a></h2>
-			  </div>
-			</div>
-			<div class="article-details">
-				<p><strong>{{ assignment.course.name }}</strong> assignment posted by <strong>{{ assignment.user.last_name }} {{ assignment.user.first_name }}</strong></p>
-                <pre>posted <strong>{{ assignment.created_at|timesince }} ago</strong></pre>
-			  <div class="article-cta">
+              </div>
+            </div>
+          </article>
+        </div>
+      {% empty %}
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+          <article class="article">
+            <div class="article-details">
+              <p>No posted assignments</p>
+              <div class="article-cta">
+                <a href="#" class="btn btn-primary">Read More</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      {% endfor %}
+      {% elif request.user.is_teacher %}
+      {% for assignment in assign %}
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+          <article class="article card">
+            <div class="article-header">
+              <div class="article-image" data-background="{% static 'dash/img/blog/img08.png' %}">
+              </div>
+              <div class="article-title">
+                <h2><a href="#">{{ assignment.title }}</a></h2>
+              </div>
+            </div>
+            <div class="article-details">
+              <p><strong>{{ assignment.course.name }}</strong> assignment posted by <strong>{{ assignment.user.last_name }} {{ assignment.user.first_name }}</strong></p>
+              <pre>posted <strong>{{ assignment.created_at|timesince }} ago</strong></pre>
+              <div class="article-cta">
                 <a href="{{ assignment.link }}" class="btn btn-primary" target="_blank">View Assignment</a>
                 <a class="btn btn-outline-primary" href="#">Edit Assignment</a>
                 <a href="/delete_g_assignment/{{ assignment.id }}/" class="btn btn-outline-danger">Delete Assignment</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		
-		{% empty %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article">
-			
-			<div class="article-details">
-			  <p>No posted assignments</p>
-			  <div class="article-cta">
-				<a href="#" class="btn btn-primary">Read More</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		{% endfor %}
-		{% elif request.user.is_student %}
-        {% for assignment in assignments %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article card">
-			<div class="article-header">
-			  <div class="article-image" data-background="{% static 'dash/img/blog/img08.png' %}">
-			  </div>
-			  <div class="article-title">
-				<h2><a href="#">{{ assignment.title }}</a></h2>
-			  </div>
-			</div>
-			<div class="article-details">
-				<p><strong>{{ assignment.course.name }}</strong> assignment posted by <strong>{{ assignment.user.last_name }} {{ assignment.user.first_name }}</strong></p>
-                <pre>posted <strong>{{ assignment.created_at|timesince }} ago</strong></pre>
-			  <div class="article-cta">
+              </div>
+            </div>
+          </article>
+        </div>
+      {% empty %}
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+          <article class="article">
+            <div class="article-details">
+              <p>No posted assignments</p>
+              <div class="article-cta">
+                <a href="#" class="btn btn-primary">Read More</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      {% endfor %}
+      {% elif request.user.is_student %}
+      {% for assignment in assignments %}
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+          <article class="article card">
+            <div class="article-header">
+              <div class="article-image" data-background="{% static 'dash/img/blog/img08.png' %}">
+              </div>
+              <div class="article-title">
+                <h2><a href="#">{{ assignment.title }}</a></h2>
+              </div>
+            </div>
+            <div class="article-details">
+              <p><strong>{{ assignment.course.name }}</strong> assignment posted by <strong>{{ assignment.user.last_name }} {{ assignment.user.first_name }}</strong></p>
+              <pre>posted <strong>{{ assignment.created_at|timesince }} ago</strong></pre>
+              <div class="article-cta">
                 <a href="{{ assignment.link }}" class="btn btn-primary" target="_blank">View Assignment</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		
-		{% empty %}
-		<div class="col-12 col-sm-6 col-md-6 col-lg-3">
-		  <article class="article">
-			
-			<div class="article-details">
-			  <p>No posted assignments</p>
-			  <div class="article-cta">
-				<a href="#" class="btn btn-primary">Read More</a>
-			  </div>
-			</div>
-		  </article>
-		</div>
-		{% endfor %}
-		{% endif %}
-	  </div>
-	</div>
-  </section>
-  <div class="settingSidebar">
-	<a href="javascript:void(0)" class="settingPanelToggle"> <i class="fa fa-spin fa-cog"></i>
-	</a>
-	<div class="settingSidebar-body ps-container ps-theme-default">
-	  <div class=" fade show active">
-		<div class="setting-panel-header">Setting Panel
-		</div>
-		<div class="p-15 border-bottom">
-		  <h6 class="font-medium m-b-10">Select Layout</h6>
-		  <div class="selectgroup layout-color w-50">
-			<label class="selectgroup-item">
-			  <input type="radio" name="value" value="1" class="selectgroup-input-radio select-layout" checked>
-			  <span class="selectgroup-button">Light</span>
-			</label>
-			<label class="selectgroup-item">
-			  <input type="radio" name="value" value="2" class="selectgroup-input-radio select-layout">
-			  <span class="selectgroup-button">Dark</span>
-			</label>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <h6 class="font-medium m-b-10">Sidebar Color</h6>
-		  <div class="selectgroup selectgroup-pills sidebar-color">
-			<label class="selectgroup-item">
-			  <input type="radio" name="icon-input" value="1" class="selectgroup-input select-sidebar">
-			  <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-				data-original-title="Light Sidebar"><i class="fas fa-sun"></i></span>
-			</label>
-			<label class="selectgroup-item">
-			  <input type="radio" name="icon-input" value="2" class="selectgroup-input select-sidebar" checked>
-			  <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-				data-original-title="Dark Sidebar"><i class="fas fa-moon"></i></span>
-			</label>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <h6 class="font-medium m-b-10">Color Theme</h6>
-		  <div class="theme-setting-options">
-			<ul class="choose-theme list-unstyled mb-0">
-			  <li title="white" class="active">
-				<div class="white"></div>
-			  </li>
-			  <li title="cyan">
-				<div class="cyan"></div>
-			  </li>
-			  <li title="black">
-				<div class="black"></div>
-			  </li>
-			  <li title="purple">
-				<div class="purple"></div>
-			  </li>
-			  <li title="orange">
-				<div class="orange"></div>
-			  </li>
-			  <li title="green">
-				<div class="green"></div>
-			  </li>
-			  <li title="red">
-				<div class="red"></div>
-			  </li>
-			</ul>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <div class="theme-setting-options">
-			<label class="m-b-0">
-			  <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-				id="mini_sidebar_setting">
-			  <span class="custom-switch-indicator"></span>
-			  <span class="control-label p-l-10">Mini Sidebar</span>
-			</label>
-		  </div>
-		</div>
-		<div class="p-15 border-bottom">
-		  <div class="theme-setting-options">
-			<label class="m-b-0">
-			  <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-				id="sticky_header_setting">
-			  <span class="custom-switch-indicator"></span>
-			  <span class="control-label p-l-10">Sticky Header</span>
-			</label>
-		  </div>
-		</div>
-		<div class="mt-4 mb-4 p-3 align-center rt-sidebar-last-ele">
-		  <a href="#" class="btn btn-icon icon-left btn-primary btn-restore-theme">
-			<i class="fas fa-undo"></i> Restore Default
-		  </a>
-		</div>
-	  </div>
-	</div>
+              </div>
+            </div>
+          </article>
+        </div>
+      {% empty %}
+        <div class="col-12 col-sm-6 col-md-6 col-lg-3">
+          <article class="article">
+            <div class="article-details">
+              <p>No posted assignments</p>
+              <div class="article-cta">
+                <a href="#" class="btn btn-primary">Read More</a>
+              </div>
+            </div>
+          </article>
+        </div>
+      {% endfor %}
+      {% endif %}
+    </div>
   </div>
+</section>
+
+<div class="settingSidebar">
+  <a href="javascript:void(0)" class="settingPanelToggle"> <i class="fa fa-spin fa-cog"></i></a>
+  <div class="settingSidebar-body ps-container ps-theme-default">
+    <div class="fade show active">
+      <div class="setting-panel-header">Setting Panel</div>
+      <div class="p-15 border-bottom">
+        <h6 class="font-medium m-b-10">Select Layout</h6>
+        <div class="selectgroup layout-color w-50">
+          <label class="selectgroup-item">
+            <input type="radio" name="value" value="1" class="selectgroup-input-radio select-layout" checked>
+            <span class="selectgroup-button">Light</span>
+          </label>
+          <label class="selectgroup-item">
+            <input type="radio" name="value" value="2" class="selectgroup-input-radio select-layout">
+            <span class="selectgroup-button">Dark</span>
+          </label>
+        </div>
+      </div>
+      <div class="p-15 border-bottom">
+        <h6 class="font-medium m-b-10">Sidebar Color</h6>
+        <div class="selectgroup selectgroup-pills sidebar-color">
+          <label class="selectgroup-item">
+            <input type="radio" name="icon-input" value="1" class="selectgroup-input select-sidebar">
+            <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip" data-original-title="Light Sidebar"><i class="fas fa-sun"></i></span>
+          </label>
+          <label class="selectgroup-item">
+            <input type="radio" name="icon-input" value="2" class="selectgroup-input select-sidebar" checked>
+            <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip" data-original-title="Dark Sidebar"><i class="fas fa-moon"></i></span>
+          </label>
+        </div>
+      </div>
+      <div class="mt-4 mb-4 p-3 align-center rt-sidebar-last-ele">
+        <a href="#" class="btn btn-icon icon-left btn-primary btn-restore-theme">
+          <i class="fas fa-undo"></i> Restore Default
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
 {% endblock content %}

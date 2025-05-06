@@ -299,10 +299,10 @@ class Level(models.Model):
 class Unit(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='units')
     level = models.ForeignKey(Level, on_delete=models.CASCADE, blank=True, null=True, related_name='unit_level')
-    name = models.CharField(max_length=15, blank=True, null=True)
-    teacher = models.CharField(max_length=15, blank=True, null=True)
-    unit_code = models.CharField(max_length=15, unique=True, blank=True, null=True, editable=False)
-    created_by = models.CharField(max_length=15, blank=True, null=True)
+    name = models.CharField(max_length=50, blank=True, null=True)
+    teacher = models.CharField(max_length=50, blank=True, null=True)
+    unit_code = models.CharField(max_length=50, unique=True, blank=True, null=True, editable=False)
+    created_by = models.CharField(max_length=50, blank=True, null=True)
     modified_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
 
