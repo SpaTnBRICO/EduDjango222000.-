@@ -41,15 +41,15 @@ def send_otp(request):
 
     print(f"Generated OTP: {otp}, Valid until: {valid_until.isoformat()}")
 
-    username = request.session.get('username')
+    email = request.session.get('email')
     
-    if not username:
-        messages.error(request, "Username not found in session.")
+    if not email:
+        messages.error(request, "Email not found in session.")
         return None
 
     try:
         # Retrieve user and profile
-        user_obj = get_object_or_404(CustomerUser, username=username)
+        user_obj = get_object_or_404(CustomerUser, email=email)
 
         # Prepare the email content
         subject = "Your OTP for TechSols"

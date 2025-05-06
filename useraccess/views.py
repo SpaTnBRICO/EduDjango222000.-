@@ -43,6 +43,12 @@ from django.db import transaction
 # Get the User model
 CustomerUser = get_user_model()
 
+
+def custom_page_not_found_view(request, exception):
+    if request.user.is_authenticated:
+        logout(request)
+    return render(request, "custom_404.html", status=404)
+
 # User Registration View
 #@redirect_if_authenticated
 def user_register(request):
@@ -210,27 +216,27 @@ def user_login(request):
     Handles the user login process, including OTP generation.
     """
     if request.method == "POST":
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         pass1 = request.POST.get('pass1')
         
         # Authenticate user
-        user = authenticate(username=username, password=pass1)
+        user = authenticate(email=email, password=pass1)
 
-        if user is not None and user.is_active:
+        if user is not None and not user.is_active:
+            messages.warning(request, "Your account is deactivated. Contact the admin to activate.")
+            return redirect('/auth_access/signin/')
+
+        elif user is not None and user.is_active:
             # Store username in session before calling send_otp
-            request.session['username'] = username
+            request.session['email'] = email
             
             # Generate OTP for the user
             send_otp(request)
             
             return redirect('/auth_access/otp/')
-        
-        elif user is not None and not user.is_active:
-            messages.warning(request, "Your account is deactivated. Contact the admin to activate.")
-            return redirect('/auth_access/signin/')
 
         else:
-            messages.warning(request, "Invalid credentials! Try again.")
+            messages.warning(request, "Invalid credentials! Try again or Account is not activated.")
             return redirect('/auth_access/signin/')
 
     return render(request, "login.html", {})
@@ -245,7 +251,7 @@ def otp_view(request):
     """
     if request.method == "POST":
         otp = request.POST.get('otp')
-        username = request.session.get('username')
+        email = request.session.get('email')
 
         # Retrieve OTP secret key and expiration date from the session
         otp_secret_key = request.session.get('otp_secret_key')
@@ -257,7 +263,9 @@ def otp_view(request):
             if valid_until > datetime.now():
                 totp = pyotp.TOTP(otp_secret_key, interval=600)
                 if totp.verify(otp):  # Verify OTP
-                    user = get_object_or_404(CustomerUser, username=username)
+                    user = get_object_or_404(CustomerUser, email=email)
+
+                    user.backend = 'useraccess.auth_backends.EmailAuthBackend'
                     login(request, user)  # Log in the user
 
                     # Clear OTP data from session after successful login

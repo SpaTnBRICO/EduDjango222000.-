@@ -1,9 +1,14 @@
 from django.urls import path
+from django.conf.urls import handler404
 from . import views
+
+handler404 = views.custom_page_not_found_view
 
 
 
 urlpatterns = [
+    path('force-404/', views.custom_page_not_found_view, {'exception': Exception("Page not found")}),
+
     path('signin/', views.user_login, name="signin"),
     path('otp/', views.otp_view, name="otp"),
     path('signout/', views.user_logout, name="signout"),

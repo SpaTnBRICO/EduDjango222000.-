@@ -193,6 +193,12 @@ BASE_URL = 'http://localhost:8000'  # Update with the correct base URL (or domai
 AUTH_USER_MODEL = 'useraccess.CustomerUser'
 LOGIN_URL = '/auth_access/signin/'
 
+AUTHENTICATION_BACKENDS = [
+    'useraccess.auth_backends.EmailAuthBackend',  
+    'django.contrib.auth.backends.ModelBackend',  # Fallback to default
+]
+
+
 SIMPLE_JWT = {
     "ACCESS_TOKEN": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
