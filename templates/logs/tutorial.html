@@ -1,158 +1,144 @@
 {% extends '../baseadmin.html' %}
 {% load static %}
 {% block content %}
-    <section class="section">
-      <div class="section-body">
-        <div class="row">
-           
-          <div class="col-12">
-            {% for message in messages %}
-            <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
-                <strong>{{ message }}</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+<section class="section">
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        {% for message in messages %}
+        <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
+          <strong>{{ message }}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        <form method="POST" enctype="multipart/form-data" action="{% url 'create_tutorial' %}">
+          {% csrf_token %}
+          <div class="card">
+            <div class="card-header">
+              <h4>POST TUTORIAL</h4>
             </div>
-            {% endfor %}
-            <form method="POST" enctype="multipart/form-data" action="{% url 'create_tutorial' %}">
-                {% csrf_token %}
-            <div class="card">
-              <div class="card-header">
-                <h4>POST TUTORIAL</h4>
-              </div>
-              <div class="card-body">
-                <div class="form-group row mb-4">
-                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Topic</label>
-                  <div class="col-sm-12 col-md-7">
-                    <input type="text" name="title" class="form-control" required>
-                  </div>
-                </div>
-                <div class="form-group row mb-4">
-                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Course</label>
-                  <div class="col-sm-12 col-md-7">
-                    <select class="form-control selectric" name="course" required>
-                        {% for course in courses %}
-                            <option value="{{ course.id }}">{{ course.name }}</option>
-                        {% endfor %}
-                    </select>
-                  </div>
-                </div>
-                <div class="form-group row mb-4">
-                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Cover Thumbnail</label>
-                  <div class="col-sm-12 col-md-7">
-                    <div id="image-preview" class="image-preview">
-                      <label for="image-upload" id="image-label">Choose File</label>
-                      <input type="file"  name="thumbnail" id="image-upload" accept="image/*" required />
-                    </div>
-                  </div>
-                </div>
-                <div class="form-group row mb-4">
-                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">VIDEO</label>
-                  <div class="col-sm-12 col-md-7">
-                    <input type="file" name="video_file" class="form-control inputtags" accept="video/*"
-                    required>
-                  </div>
-                </div>
-                <div class="form-group row mb-4">
-                  <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3"></label>
-                  <div class="col-sm-12 col-md-7">
-                    <button class="btn btn-primary">Post</button>
-                  </div>
+            <div class="card-body">
+              
+              <!-- Topic -->
+              <div class="form-group row mb-4">
+                <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Topic</label>
+                <div class="col-sm-12 col-md-7">
+                  <input type="text" name="title" class="form-control" required>
                 </div>
               </div>
-            </div>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
-    <div class="settingSidebar">
-      <a href="javascript:void(0)" class="settingPanelToggle"> <i class="fa fa-spin fa-cog"></i>
-      </a>
-      <div class="settingSidebar-body ps-container ps-theme-default">
-        <div class=" fade show active">
-          <div class="setting-panel-header">Setting Panel
-          </div>
-          <div class="p-15 border-bottom">
-            <h6 class="font-medium m-b-10">Select Layout</h6>
-            <div class="selectgroup layout-color w-50">
-              <label class="selectgroup-item">
-                <input type="radio" name="value" value="1" class="selectgroup-input-radio select-layout" checked>
-                <span class="selectgroup-button">Light</span>
-              </label>
-              <label class="selectgroup-item">
-                <input type="radio" name="value" value="2" class="selectgroup-input-radio select-layout">
-                <span class="selectgroup-button">Dark</span>
-              </label>
-            </div>
-          </div>
-          <div class="p-15 border-bottom">
-            <h6 class="font-medium m-b-10">Sidebar Color</h6>
-            <div class="selectgroup selectgroup-pills sidebar-color">
-              <label class="selectgroup-item">
-                <input type="radio" name="icon-input" value="1" class="selectgroup-input select-sidebar">
-                <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-                  data-original-title="Light Sidebar"><i class="fas fa-sun"></i></span>
-              </label>
-              <label class="selectgroup-item">
-                <input type="radio" name="icon-input" value="2" class="selectgroup-input select-sidebar" checked>
-                <span class="selectgroup-button selectgroup-button-icon" data-toggle="tooltip"
-                  data-original-title="Dark Sidebar"><i class="fas fa-moon"></i></span>
-              </label>
-            </div>
-          </div>
-          <div class="p-15 border-bottom">
-            <h6 class="font-medium m-b-10">Color Theme</h6>
-            <div class="theme-setting-options">
-              <ul class="choose-theme list-unstyled mb-0">
-                <li title="white" class="active">
-                  <div class="white"></div>
-                </li>
-                <li title="cyan">
-                  <div class="cyan"></div>
-                </li>
-                <li title="black">
-                  <div class="black"></div>
-                </li>
-                <li title="purple">
-                  <div class="purple"></div>
-                </li>
-                <li title="orange">
-                  <div class="orange"></div>
-                </li>
-                <li title="green">
-                  <div class="green"></div>
-                </li>
-                <li title="red">
-                  <div class="red"></div>
-                </li>
-              </ul>
+
+              <!-- Department Dropdown -->
+              <div class="form-group row mb-4">
+                <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Department</label>
+                <div class="col-sm-12 col-md-7">
+                  <select class="form-control" id="department-dropdown" name="department_id" required>
+                    <option value="">Select a department</option>
+                    {% for department in departments %}
+                      <option value="{{ department.id }}">{{ department.name }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+              </div>
+
+              <!-- Course Dropdown -->
+              <div class="form-group row mb-4">
+                <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Course</label>
+                <div class="col-sm-12 col-md-7">
+                  <select class="form-control" id="course-dropdown" name="course_id" required>
+                    <option value="">Select a department first</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Level Dropdown -->
+              <div class="form-group row mb-4">
+                <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Level</label>
+                <div class="col-sm-12 col-md-7">
+                  <select class="form-control" id="level-dropdown" name="level_id" required>
+                    <option value="">Select a course first</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Thumbnail Upload -->
+              <div class="form-group row mb-4">
+                <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Cover Thumbnail</label>
+                <div class="col-sm-12 col-md-7">
+                  <div id="image-preview" class="image-preview">
+                    <label for="image-upload" id="image-label">Choose File</label>
+                    <input type="file" name="thumbnail" id="image-upload" accept="image/*" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Video Upload -->
+              <div class="form-group row mb-4">
+                <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">VIDEO</label>
+                <div class="col-sm-12 col-md-7">
+                  <input type="file" name="video_file" class="form-control inputtags" accept="video/*" required>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="form-group row mb-4">
+                <div class="col-sm-12 col-md-7">
+                  <button class="btn btn-primary">Post</button>
+                </div>
+              </div>
+
             </div>
           </div>
-          <div class="p-15 border-bottom">
-            <div class="theme-setting-options">
-              <label class="m-b-0">
-                <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-                  id="mini_sidebar_setting">
-                <span class="custom-switch-indicator"></span>
-                <span class="control-label p-l-10">Mini Sidebar</span>
-              </label>
-            </div>
-          </div>
-          <div class="p-15 border-bottom">
-            <div class="theme-setting-options">
-              <label class="m-b-0">
-                <input type="checkbox" name="custom-switch-checkbox" class="custom-switch-input"
-                  id="sticky_header_setting">
-                <span class="custom-switch-indicator"></span>
-                <span class="control-label p-l-10">Sticky Header</span>
-              </label>
-            </div>
-          </div>
-          <div class="mt-4 mb-4 p-3 align-center rt-sidebar-last-ele">
-            <a href="#" class="btn btn-icon icon-left btn-primary btn-restore-theme">
-              <i class="fas fa-undo"></i> Restore Default
-            </a>
-          </div>
-        </div>
+        </form>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- AJAX Script for Dynamic Dropdowns -->
+<script>
+  document.getElementById('department-dropdown').addEventListener('change', function () {
+    const deptId = this.value;
+    const courseDropdown = document.getElementById('course-dropdown');
+    const levelDropdown = document.getElementById('level-dropdown');
+
+    courseDropdown.innerHTML = '<option value="">Loading...</option>';
+    levelDropdown.innerHTML = '<option value="">Select Level</option>';
+
+    if (deptId) {
+      fetch(`/auth_access/get-courses/${deptId}/`)
+        .then(res => res.json())
+        .then(data => {
+          courseDropdown.innerHTML = '<option value="">Select Course</option>';
+          data.courses.forEach(course => {
+            courseDropdown.innerHTML += `<option value="${course.id}">${course.name}</option>`;
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching courses:", error);
+        });
+    }
+  });
+
+  document.getElementById('course-dropdown').addEventListener('change', function () {
+    const courseId = this.value;
+    const levelDropdown = document.getElementById('level-dropdown');
+
+    levelDropdown.innerHTML = '<option value="">Loading...</option>';
+
+    if (courseId) {
+      fetch(`/auth_access/get-levels/${courseId}/`)
+        .then(res => res.json())
+        .then(data => {
+          levelDropdown.innerHTML = '<option value="">Select Level</option>';
+          data.levels.forEach(level => {
+            levelDropdown.innerHTML += `<option value="${level.id}">${level.name}</option>`;
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching levels:", error);
+        });
+    }
+  });
+</script>
+
 {% endblock content %}

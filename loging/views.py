@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from useraccess.models import Course, Department, StudentApp, Teacher, UserProfile, CustomerUser, Unit, CAT, CATScore
+from useraccess.models import Course, Level, Department, StudentApp, Teacher, UserProfile, CustomerUser, Unit, CAT, CATScore
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import FeePayment, SiteLogo, GoogleFormAssignment, Tutorial, Notes, Quiz, Question, Answer, QuizAttempt, Contact, Reply, ComposeEmail, Event, Blog, News, Slider
@@ -567,33 +567,52 @@ def g_post_assignment(request):
     if not (request.user.is_admin or request.user.is_teacher):
         messages.error(request, "You don't have permission to view this page.")
         return redirect('home')
-    user = request.user
-    user_profile = get_object_or_404(UserProfile, user=request.user)
-    if request.method == 'POST':
-        # Extract data from the form
-        topic = request.POST['topic']
-        link = request.POST['link']
-        course_id = request.POST['course_id']
 
-        course = Course.objects.get(id=course_id)
-        
+    user = request.user
+    user_profile = get_object_or_404(UserProfile, user=user)
+
+    if request.method == 'POST':
+        topic = request.POST.get('topic')
+        link = request.POST.get('link')
+        course_id = request.POST.get('course_id')
+        level_id = request.POST.get('level_id')
+
+        if not all([topic, link, course_id, level_id]):
+            messages.error(request, "All fields are required.")
+            return redirect('g_post_assignment')
+
+        try:
+            course = Course.objects.get(id=course_id)
+            level = Level.objects.get(id=level_id, course=course)
+        except (Course.DoesNotExist, Level.DoesNotExist):
+            messages.error(request, "Invalid course or level selected.")
+            return redirect('g_post_assignment')
+
         assignment = GoogleFormAssignment(
+            title=topic,
             link=link,
             course=course,
-            title=topic,
+            level=level,
             user=user
         )
         assignment.save()
-        
-        messages.info(request, 'Assignmet created and posted successfully.')
-        return redirect('/g_assignment/')  # Redirect to success page after the application is submitted
-    
-    # Retrieve all available courses to show in the form
-    courses = Course.objects.all()
+        messages.success(request, 'Assignment created and posted successfully.')
+        return redirect('/g_assignment/')
+
+    # Pass departments instead of courses for the dynamic form
+    departments = Department.objects.all()
     return render(request, "logs/post_assignment.html", {
-        'courses':courses,
-        'user_profile':user_profile,
-        })
+        'departments': departments,
+        'user_profile': user_profile,
+    })
+
+def get_courses_by_department(request, department_id):
+    courses = Course.objects.filter(department_id=department_id).values('id', 'name')
+    return JsonResponse({'courses': list(courses)})
+
+def get_levels_by_course(request, course_id):
+    levels = Level.objects.filter(course_id=course_id).values('id', 'name')
+    return JsonResponse({'levels': list(levels)})
 
 @login_required
 def delete_g_assignment(request, id):
@@ -650,30 +669,41 @@ def view_posted_assignments(request):
 
 
 # View for creating a new note
+
 @login_required
 def create_note(request):
     if not (request.user.is_admin or request.user.is_teacher):
         messages.error(request, "You don't have permission to view this page.")
         return redirect('home')
+
     user_profile = get_object_or_404(UserProfile, user=request.user)
+
     if request.method == 'POST':
         # Handle the form submission
         title = request.POST.get('title')
         thumbnail = request.FILES.get('thumbnail')
-        course_id = request.POST.get('course')
+        course_id = request.POST.get('course_id')  # Get the selected course ID
+        level_id = request.POST.get('level_id')  # Get the selected level ID
         file = request.FILES.get('file')
+
         user = request.user  # Assuming the user is logged in
 
-        course = Course.objects.get(id=course_id)
-        note = Notes(user=user, title=title, thumbnail=thumbnail, course=course, file=file)
+        # Fetch course and level objects
+        course = get_object_or_404(Course, id=course_id)
+        level = get_object_or_404(Level, id=level_id)
+
+        # Create a new Note instance and save it
+        note = Notes(user=user, title=title, thumbnail=thumbnail, course=course, level=level, file=file)
         note.save()
 
         messages.success(request, f"{title} notes created successfully.")
-        return redirect('/create-note/')  # Redirect to a success page
+        return redirect('/create-note/')  # Redirect to the create note page or a success page
 
-    # Get the list of courses to display in the dropdown
-    courses = Course.objects.all()
-    return render(request, 'logs/notes.html', {'courses': courses, 'user_profile': user_profile})
+    # Get the list of departments for the department dropdown
+    departments = Department.objects.all()  # Assuming a Department model exists
+
+    return render(request, 'logs/notes.html', {'departments': departments, 'user_profile': user_profile})
+
 
 @login_required
 def view_posted_notes(request):
@@ -732,26 +762,44 @@ def create_tutorial(request):
     if not (request.user.is_admin or request.user.is_teacher):
         messages.error(request, "You don't have permission to view this page.")
         return redirect('home')
+
     user_profile = get_object_or_404(UserProfile, user=request.user)
+
     if request.method == 'POST':
-        # Handle the form submission
         title = request.POST.get('title')
         thumbnail = request.FILES.get('thumbnail')
-        course_id = request.POST.get('course')
+        course_id = request.POST.get('course_id')  # updated name
+        level_id = request.POST.get('level_id')    # added
         video_file = request.FILES.get('video_file')
-        user = request.user  # Assuming the user is logged in
+        user = request.user
 
-        course = Course.objects.get(id=course_id)
-        tutorial = Tutorial(user=user, title=title, thumbnail=thumbnail, course=course, video_file=video_file)
-        tutorial.save()
+        try:
+            course = Course.objects.get(id=course_id)
+            level = Level.objects.get(id=level_id)
 
-        messages.success(request, f"{title} tutorial is posted successfully.")
-        messages.info(request, f"post another video if needed.")
-        return redirect('/create-tutorial/')  # Redirect to a success page
+            tutorial = Tutorial(
+                user=user,
+                title=title,
+                thumbnail=thumbnail,
+                course=course,
+                level=level,
+                video_file=video_file
+            )
+            tutorial.save()
 
-    # Get the list of courses to display in the dropdown
-    courses = Course.objects.all()
-    return render(request, 'logs/tutorial.html', {'courses': courses, 'user_profile': user_profile})
+            messages.success(request, f"{title} tutorial is posted successfully.")
+            messages.info(request, f"Post another video if needed.")
+            return redirect('/create-tutorial/')
+        except (Course.DoesNotExist, Level.DoesNotExist):
+            messages.error(request, "Invalid course or level selected.")
+            return redirect('/create-tutorial/')
+
+    # For initial form rendering
+    departments = Department.objects.all()
+    return render(request, 'logs/tutorial.html', {
+        'departments': departments,
+        'user_profile': user_profile
+    })
 
 
 @login_required
@@ -1387,20 +1435,23 @@ def create_quiz(request):
 
     if request.method == 'POST':
         title = request.POST.get('title', '').strip()
-        course_id = request.POST.get('course')
+        course_id = request.POST.get('course_id')
+        level_id = request.POST.get('level_id')
         is_exam = request.POST.get('is_exam') == 'on'
         
         # Validate title and course
-        if not title or not course_id:
-            messages.error(request, "Both title and course are required.")
+        if not title or not course_id or not level_id:
+            messages.error(request, "title, level and course are required.")
             return redirect('create_quiz')
 
-        course = get_object_or_404(Course, id=course_id)
+        course = Course.objects.get(id=course_id)
+        level = Level.objects.get(id=level_id)
 
         # Create the Quiz
         quiz = Quiz.objects.create(
             title=title,
             course=course,
+            level=level,
             teacher=request.user.first_name,
             is_exam=is_exam
         )
@@ -1409,7 +1460,8 @@ def create_quiz(request):
         return redirect('add_questions', quiz_id=quiz.id)
 
     courses = Course.objects.all()
-    return render(request, 'logs/create_quiz.html', {'courses': courses, 'user_profile': user_profile,})
+    departments = Department.objects.all()
+    return render(request, 'logs/create_quiz.html', {'departments': departments, 'user_profile': user_profile,})
 
 @login_required
 def add_questions(request, quiz_id):

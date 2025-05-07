@@ -403,7 +403,7 @@ class StudentApp(models.Model):
         try:
             token = PasswordResetTokenGenerator().make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            activation_link = f"{settings.BASE_URL}/auth_access/activate/{uid}/{token}/"
+            activation_link = f"https://437e-197-232-12-20.ngrok-free.app/auth_access/activate/{uid}/{token}/"
             print(activation_link)
 
             email_address = user.email
@@ -419,7 +419,7 @@ class StudentApp(models.Model):
                 f"Your registration number is: {self.registration_number}\n\n"
                 f"Login Info:\n"
                 f" - Username: {self.registration_number}\n"
-                f" - Password: Your student ID\n\n"
+                f" - Password: Your ID\n\n"
                 f"Activate your account here:\n{activation_link}\n\n"
                 f"If you need help, contact the admissions team.\n\n"
                 f"Best regards,\n"
@@ -483,7 +483,7 @@ class Teacher(models.Model):
     def send_confirmation_email(self, user):
         token = PasswordResetTokenGenerator().make_token(user)
         uid = urlsafe_base64_encode(force_bytes(user.pk))
-        activation_link = f"{settings.BASE_URL}/auth_access/activate/{uid}/{token}/"
+        activation_link = f"https://437e-197-232-12-20.ngrok-free.app/auth_access/activate/{uid}/{token}/"
         print(f"Activation Link: {activation_link}")
 
         try:

@@ -1,5 +1,5 @@
 from django.db import models
-from useraccess.models import StudentApp, CustomerUser, Course
+from useraccess.models import StudentApp, CustomerUser, Course, Level
 from decimal import Decimal
 import random
 import string
@@ -509,6 +509,7 @@ class GoogleFormAssignment(models.Model):
     user = models.ForeignKey(CustomerUser, related_name='googleform', on_delete=models.CASCADE)
     title = models.CharField(max_length=50, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE)
     link = models.URLField()
     created_at = models.DateField(auto_now_add=True)
 
@@ -522,6 +523,7 @@ class Notes(models.Model):
     title = models.CharField(max_length=50, null=True, blank=True)
     thumbnail = models.ImageField(upload_to='notes_thumbnails/')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE, null=True, blank=True)
     file = models.FileField(upload_to='notes_docs/')
     created = models.DateField(auto_now_add=True)
 
@@ -534,6 +536,7 @@ class Tutorial(models.Model):
     title = models.CharField(max_length=50, null=True, blank=True)
     thumbnail = models.ImageField(upload_to='tutorial_thumbnails/')
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE, null=True, blank=True)
     video_file = models.FileField(upload_to='tutorial_videos/')  # To upload videos to a folder
     created = models.DateField(auto_now_add=True)
 
@@ -544,6 +547,7 @@ class Tutorial(models.Model):
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='quizzes')
+    level = models.ForeignKey(Level, on_delete=models.CASCADE, null=True, blank=True)
     teacher = models.CharField(max_length=255, null=False, blank=True)
     is_exam = models.BooleanField(default=False)  # True for exam, False for quiz
     created_at = models.DateTimeField(default=timezone.now)

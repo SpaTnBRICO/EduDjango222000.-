@@ -46,7 +46,7 @@ netsh advfirewall firewall add rule name="Allow Django 8000" protocol=TCP dir=in
 """
 
 CSRF_TRUSTED_ORIGINS = [
-    "https://4eaf-197-232-12-20.ngrok-free.app"
+    "https://437e-197-232-12-20.ngrok-free.app"
 ]
 
 
@@ -187,7 +187,7 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
 # Base URL for generating the reset link
-BASE_URL = 'http://localhost:8000'  # Update with the correct base URL (or domain)
+BASE_URL = 'https://437e-197-232-12-20.ngrok-free.app'  # Update with the correct base URL (or domain)
 
 
 AUTH_USER_MODEL = 'useraccess.CustomerUser'

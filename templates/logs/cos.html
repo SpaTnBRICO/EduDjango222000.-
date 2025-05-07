@@ -103,7 +103,7 @@
                                         <a href="{% url 'cos_apply' course.id %}" class="btn">Take Course</a>
                                     </div>
                                     <div class="info-bx text-center">
-                                        <h5><a href="#">{{ course.name }}</a></h5>
+                                        <h5><a href="{% url 'cos_apply' course.id %}">{{ course.name }}</a></h5>
                                         <span>{{ course.department.name }}</span>
                                     </div>
                                     <div class="cours-more-info">

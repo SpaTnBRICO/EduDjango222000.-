@@ -7,6 +7,7 @@ urlpatterns = [
     path('create_slides/',views.create_slides, name="create_slides"),
     path('manage_slides/',views.manage_slides, name="manage_slides"),
     path('logos/',views.logo, name="logo"),
+
     path('create_logos/',views.create_logos, name="create_logos"),
     path('deactivate_logo/<int:logo_id>/',views.deactivate_logo, name="deactivate_logo"),
     path('set_active_logo/<int:logo_id>/',views.set_active_logo, name="set_active_logo"),
@@ -48,6 +49,8 @@ urlpatterns = [
     #path('payment-receipt/<int:payment_id>/', views.payment_receipt, name='payment_receipt'),
     path('payment_receipt/<int:payment_id>/', views.payment_receipt_pdf, name='payment_receipt_pdf'),
     path('g_assignment/',views.g_post_assignment, name="g_post_assignment"),
+    path('get-courses/<int:department_id>/', views.get_courses_by_department, name='get_courses_by_department'),
+    path('get-levels/<int:course_id>/', views.get_levels_by_course, name='get_levels_by_course'),
     path('view_posted_assignments/', views.view_posted_assignments, name='view_posted_assignments'),
     path('delete_g_assignment/<int:id>/', views.delete_g_assignment, name='delete_gassignment'),
     # URL for creating a note

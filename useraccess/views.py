@@ -1124,6 +1124,8 @@ class ActivateAccountView(View):
             print(f"Token valid for user: {user.username}")  # Debugging output
             user.is_active = True  # Set the user as active
             user.save()  # Save the user after activation
+            
+            user.backend = 'useraccess.auth_backends.EmailAuthBackend'
             login(request, user)# Log the user in
 
             if user.is_student == True:

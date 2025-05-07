@@ -16,15 +16,38 @@
                         <input type="text" id="title" name="title" class="form-control" required>
                     </div>
         
-                    <!-- Course Select Input -->
-                    <div class="mb-3">
-                        <label for="course" class="form-label">Course</label>
-                        <select id="course" name="course" class="form-select" required>
-                            {% for course in courses %}
-                                <option value="{{ course.id }}">{{ course.name }}</option>
+                        <!-- Department Dropdown -->
+                      <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Department</label>
+                        <div class="col-sm-12 col-md-7">
+                          <select class="form-control" id="department-dropdown" name="department_id" required>
+                            <option value="">Select a department</option>
+                            {% for department in departments %}
+                              <option value="{{ department.id }}">{{ department.name }}</option>
                             {% endfor %}
-                        </select>
-                    </div>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Course Dropdown -->
+                      <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Course</label>
+                        <div class="col-sm-12 col-md-7">
+                          <select class="form-control" id="course-dropdown" name="course_id" required>
+                            <option value="">Select a department first</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <!-- Level Dropdown -->
+                      <div class="form-group row mb-4">
+                        <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3">Select Level</label>
+                        <div class="col-sm-12 col-md-7">
+                          <select class="form-control" id="level-dropdown" name="level_id" required>
+                            <option value="">Select a course first</option>
+                          </select>
+                        </div>
+                      </div>
         
                     <!-- Exam Checkbox -->
                     <div class="form-check mb-3">
@@ -43,6 +66,54 @@
         
     </div>
   </section>
+
+
+  <!-- AJAX Script for Dynamic Dropdowns -->
+<script>
+  document.getElementById('department-dropdown').addEventListener('change', function () {
+    const deptId = this.value;
+    const courseDropdown = document.getElementById('course-dropdown');
+    const levelDropdown = document.getElementById('level-dropdown');
+
+    courseDropdown.innerHTML = '<option value="">Loading...</option>';
+    levelDropdown.innerHTML = '<option value="">Select Level</option>';
+
+    if (deptId) {
+      fetch(`/auth_access/get-courses/${deptId}/`)
+        .then(res => res.json())
+        .then(data => {
+          courseDropdown.innerHTML = '<option value="">Select Course</option>';
+          data.courses.forEach(course => {
+            courseDropdown.innerHTML += `<option value="${course.id}">${course.name}</option>`;
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching courses:", error);
+        });
+    }
+  });
+
+  document.getElementById('course-dropdown').addEventListener('change', function () {
+    const courseId = this.value;
+    const levelDropdown = document.getElementById('level-dropdown');
+
+    levelDropdown.innerHTML = '<option value="">Loading...</option>';
+
+    if (courseId) {
+      fetch(`/auth_access/get-levels/${courseId}/`)
+        .then(res => res.json())
+        .then(data => {
+          levelDropdown.innerHTML = '<option value="">Select Level</option>';
+          data.levels.forEach(level => {
+            levelDropdown.innerHTML += `<option value="${level.id}">${level.name}</option>`;
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching levels:", error);
+        });
+    }
+  });
+</script>
   
 
 {% endblock content %}
