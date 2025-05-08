@@ -1101,9 +1101,9 @@ def add_teacher(request):
         return redirect('apply_success')  # Redirect to success page after the application is submitted
     
     # Retrieve all available courses to show in the form
-    courses = Course.objects.all()
+    departments = Department.objects.all()
     user_profile = get_object_or_404(UserProfile, user=request.user)
-    return render(request, 'add_teacher.html', {'courses': courses, 'user_profile':user_profile})
+    return render(request, 'add_teacher.html', {'departments': departments, 'user_profile':user_profile})
 
 class ActivateAccountView(View):
     """

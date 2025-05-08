@@ -37,13 +37,22 @@
                     <input type="email" class="form-control" name="email" required>
                   </div>
                 <div class="form-group">
-                  <label>Course</label>
-                  <select class="form-control" name="course_id" required>
-                    {% for course in courses %}
-                        <option value="{{ course.id }}">{{ course.name }} ({{ course.department.name }})</option>
-                    {% endfor %}
-                  </select>
-                </div>
+                <label>Department</label>
+                <select class="form-control" name="department_id" id="departmentDropdown" required>
+                  <option value="">Select Department</option>
+                  {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Course Dropdown -->
+              <div class="form-group">
+                <label>Course</label>
+                <select class="form-control" name="course_id" id="courseDropdown" required>
+                  <option value="">Select Course</option>
+                </select>
+              </div>
                 
               </div>
               <div class="card-footer text-right">
@@ -147,4 +156,42 @@
         </div>
       </div>
     </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const departmentDropdown = document.getElementById('departmentDropdown');
+        const courseDropdown = document.getElementById('courseDropdown');
+
+        departmentDropdown.addEventListener('change', function () {
+          const deptId = this.value;
+
+          // Reset course dropdown
+          courseDropdown.innerHTML = '<option value="">Loading...</option>';
+
+          if (deptId) {
+            fetch(`/auth_access/get-courses/${deptId}/`)
+              .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+              })
+              .then(data => {
+                courseDropdown.innerHTML = '<option value="">Select Course</option>';
+                data.courses.forEach(course => {
+                  const option = document.createElement('option');
+                  option.value = course.id;
+                  option.textContent = course.name;
+                  courseDropdown.appendChild(option);
+                });
+              })
+              .catch(error => {
+                console.error('Error fetching courses:', error);
+                courseDropdown.innerHTML = '<option value="">Failed to load courses</option>';
+              });
+          } else {
+            courseDropdown.innerHTML = '<option value="">Select Course</option>';
+          }
+        });
+      });
+      </script>
+
 {% endblock content %}
