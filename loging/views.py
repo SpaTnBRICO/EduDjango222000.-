@@ -1893,3 +1893,12 @@ def cat_submission(request, cat_id):
         cat.save()
         messages.success(request, "Results Submitted Successfully")
         return redirect('/cat_list/')
+
+
+"""
+def timetable_view(request, level_id):
+    slots = WeeklySlot.objects.filter(level_id=level_id)
+    return render(request, 'timetable/timetable.html')
+::contentReference[oaicite:0]{index=0}
+
+"""

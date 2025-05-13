@@ -154,6 +154,43 @@ class Student(models.Model):
     def __str__(self):
         return f"{self.name}'s Admission Letter Info."
 
+# Define fixed time slots for scheduling classes
+TIME_SLOTS = (
+    ('9:30 - 10:30', '9:30 - 10:30'),
+    ('10:30 - 11:30', '10:30 - 11:30'),
+    ('11:30 - 12:30', '11:30 - 12:30'),
+    ('12:30 - 1:30', '12:30 - 1:30'),
+    ('2:30 - 3:30', '2:30 - 3:30'),
+    ('3:30 - 4:30', '3:30 - 4:30'),
+    ('4:30 - 5:30', '4:30 - 5:30'),
+)
+
+# Define the working days for scheduling
+DAYS_OF_WEEK = (
+    ('Monday', 'Monday'),
+    ('Tuesday', 'Tuesday'),
+    ('Wednesday', 'Wednesday'),
+    ('Thursday', 'Thursday'),
+    ('Friday', 'Friday'),
+    ('Saturday', 'Saturday'),
+)
+
+# Parameters used in the genetic algorithm for timetable generation
+POPULATION_SIZE = 9
+NUMB_OF_ELITE_SCHEDULES = 1
+TOURNAMENT_SELECTION_SIZE = 3
+MUTATION_RATE = 0.1
+
+class MeetingTime(models.Model):
+    pid = models.AutoField(primary_key=True)  # Auto-generated ID for simplicity
+    time = models.CharField(max_length=20, choices=TIME_SLOTS)  # Time slot
+    day = models.CharField(max_length=10, choices=DAYS_OF_WEEK)  # Day of the week
+
+    class Meta:
+        unique_together = ('time', 'day')  # Prevent duplicate entries like same time on same day
+
+    def __str__(self):
+        return f"{self.day} {self.time}"
 
 class Department(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -324,9 +361,33 @@ class Unit(models.Model):
     def __str__(self):
         return f"{self.name}--{self.course.name}--{self.unit_code}"
 
+class Room(models.Model):
+    r_number = models.CharField(max_length=10, unique=True)  # Room number or name (e.g., A101)
+    seating_capacity = models.PositiveIntegerField(default=30)  # Max number of students it can hold
 
+    def __str__(self):
+        return f"Room {self.r_number} ({self.seating_capacity} seats)"
 
+# Represents a scheduled session of a unit (timetable entry)
+class Session(models.Model):
+    unit = models.ForeignKey('Unit', on_delete=models.CASCADE, related_name='sessions')  # The unit/module being taught
+    instructor = models.ForeignKey('Teacher', on_delete=models.CASCADE)  # Assigned teacher
+    room = models.ForeignKey('Room', on_delete=models.CASCADE)  # Assigned room
+    meeting_time = models.ForeignKey('MeetingTime', on_delete=models.CASCADE)  # Time slot for the session
+    level = models.ForeignKey('Level', on_delete=models.CASCADE)  # Course level/year this session belongs to
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"{self.unit.name} | {self.instructor.name} | {self.level.name} | {self.meeting_time}"
+
+    class Meta:
+        unique_together = (
+            ('room', 'meeting_time'),       # Prevents a room being used in two sessions at the same time
+            ('instructor', 'meeting_time'), # Prevents a teacher from being double-booked
+            ('level', 'meeting_time'),      # Prevents a class level from having overlapping sessions
+        )
+        verbose_name = "Session"
+        verbose_name_plural = "Sessions"
 
 def default_user_instance():
     # Replace this with the logic to return a default user (e.g., the first user in the DB)

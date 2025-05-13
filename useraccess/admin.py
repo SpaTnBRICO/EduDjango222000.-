@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import UserProfile, Teacher, Level, CustomerUser, Student, Department, Course, StudentApp, Unit, CAT, Practical, CATScore, PRACScore
+from .models import *
+
 
 # Register your models here.
 admin.site.register(UserProfile)

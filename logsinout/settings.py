@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'loging.apps.LogingConfig',
     'useraccess.apps.UseraccessConfig',
+    'time_table',
 ]
 
 MIDDLEWARE = [

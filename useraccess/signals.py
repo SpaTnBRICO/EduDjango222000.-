@@ -4,6 +4,7 @@ from .models import UserProfile, CustomerUser, StudentApp, CAT, CATScore, Teache
 from django.db import transaction
 
 
+
 @receiver(post_save, sender=CustomerUser)
 def create_student_app(sender, instance, created, **kwargs):
     if created and instance.is_student is True:
@@ -73,3 +74,4 @@ def create_cat_scores_for_students(sender, instance, created, **kwargs):
                 cat=instance,
                 student=student
             )
+
