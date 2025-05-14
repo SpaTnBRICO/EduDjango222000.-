@@ -1,0 +1,52 @@
+{% extends 'baseadmin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h4>Generated Timetable</h4>
+          </div>
+          <div class="card-body">
+            {% if schedule %}
+              <div class="table-responsive">
+                <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>Level</th>
+                      <th>Course</th>
+                      <th>Unit</th>
+                      <th>Instructor</th>
+                      <th>Room</th>
+                      <th>Meeting Time</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for class in schedule %}
+                      <tr>
+                        <td>{{ class.level }}</td>
+                        <td>{{ class.course }}</td>
+                        <td>{{ class.unit }}</td>
+                        <td>{{ class.instructor }}</td>
+                        <td>{{ class.room }}</td>
+                        <td>{{ class.meeting_time }}</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <div class="alert alert-warning" role="alert">
+                No timetable data available. Please try generating again.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

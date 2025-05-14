@@ -16,6 +16,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('loging.urls')),  # Main app
     path('auth_access/', include('useraccess.urls')),  # Authentication app
+    path('timetable/', include('time_table.urls')),
 ]
 
 # ✅ Serve media files (e.g., uploaded images) during development only

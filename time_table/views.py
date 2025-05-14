@@ -1,17 +1,20 @@
-from django.http import request
-from django.shortcuts import render, redirect
-from . forms import *
-from .models import *
+import random as rnd
+from django.shortcuts import render
+from .forms import *
+from useraccess.models import *
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from .render import Render
 from django.views.generic import View
 
+# Genetic Algorithm Constants
+POPULATION_SIZE = 9
+NUMB_OF_ELITE_SCHEDULES = 1
+TOURNAMENT_SELECTION_SIZE = 3
+MUTATION_RATE = 0.05
 
-# Create your views here.
-
-
+# ---------- Data Wrapper ----------
 class Data:
     def __init__(self):
         self._rooms = Room.objects.all()
@@ -26,6 +29,7 @@ class Data:
     def get_levels(self): return self._levels
     def get_meetingTimes(self): return self._meetingTimes
 
+# ---------- Class Definition ----------
 class Class:
     def __init__(self, id, unit, level):
         self.id = id
@@ -39,41 +43,105 @@ class Class:
     def set_meetingTime(self, meetingTime): self.meeting_time = meetingTime
     def set_room(self, room): self.room = room
 
-def initialize(self):
-    self._classes = []
-    levels = data.get_levels()
-    for level in levels:
-        units = Unit.objects.filter(level=level)
-        for unit in units:
-            eligible_teachers = Teacher.objects.filter(course=unit.course, is_approved=True)
-            if not eligible_teachers.exists():
-                continue  # Skip if no eligible teacher
-            new_class = Class(self._classNumb, unit, level)
-            self._classNumb += 1
-            new_class.set_meetingTime(rnd.choice(data.get_meetingTimes()))
-            new_class.set_room(rnd.choice(data.get_rooms()))
-            new_class.set_instructor(rnd.choice(eligible_teachers))
-            self._classes.append(new_class)
-    return self
+# ---------- Schedule ----------
+class Schedule:
+    def __init__(self):
+        self._data = Data()
+        self._classes = []
+        self._classNumb = 0
+        self._fitness = -1
+        self._numberOfConflicts = 0
+        self.initialize()
 
+    def initialize(self):
+        self._classes = []
+        for level in self._data.get_levels():
+            units = Unit.objects.filter(level=level)
+            for unit in units:
+                eligible_teachers = Teacher.objects.filter(course=unit.course, is_approved=True)
+                if not eligible_teachers.exists():
+                    continue
+                new_class = Class(self._classNumb, unit, level)
+                self._classNumb += 1
+                new_class.set_meetingTime(rnd.choice(self._data.get_meetingTimes()))
+                new_class.set_room(rnd.choice(self._data.get_rooms()))
+                new_class.set_instructor(rnd.choice(eligible_teachers))
+                self._classes.append(new_class)
+        return self
 
-def calculate_fitness(self):
-    self._numberOfConflicts = 0
-    classes = self.get_classes()
-    for i in range(len(classes)):
-        for j in range(i + 1, len(classes)):
-            if classes[i].meeting_time == classes[j].meeting_time:
-                if classes[i].room == classes[j].room:
-                    self._numberOfConflicts += 1
-                if classes[i].instructor == classes[j].instructor:
-                    self._numberOfConflicts += 1
-                if classes[i].level == classes[j].level:
-                    self._numberOfConflicts += 1
-    return 1 / (1.0 * self._numberOfConflicts + 1)
+    def get_classes(self): return self._classes
 
+    def get_fitness(self):
+        if self._fitness == -1:
+            self._fitness = self.calculate_fitness()
+        return self._fitness
+
+    def calculate_fitness(self):
+        self._numberOfConflicts = 0
+        for i in range(len(self._classes)):
+            for j in range(i + 1, len(self._classes)):
+                if self._classes[i].meeting_time == self._classes[j].meeting_time:
+                    if self._classes[i].room == self._classes[j].room:
+                        self._numberOfConflicts += 1
+                    if self._classes[i].instructor == self._classes[j].instructor:
+                        self._numberOfConflicts += 1
+                    if self._classes[i].level == self._classes[j].level:
+                        self._numberOfConflicts += 1
+        return 1 / (1.0 * self._numberOfConflicts + 1)
+
+# ---------- Population ----------
+class Population:
+    def __init__(self, size):
+        self._schedules = [Schedule() for _ in range(size)]
+
+    def get_schedules(self):
+        return self._schedules
+
+# ---------- Genetic Algorithm ----------
+class GeneticAlgorithm:
+    def evolve(self, population):
+        return self._mutate_population(self._crossover_population(population))
+
+    def _crossover_population(self, pop):
+        crossover_pop = Population(0)
+        elite = pop.get_schedules()[:NUMB_OF_ELITE_SCHEDULES]
+        crossover_pop.get_schedules().extend(elite)
+
+        for i in range(NUMB_OF_ELITE_SCHEDULES, POPULATION_SIZE):
+            parent1 = self._select_tournament_population(pop).get_schedules()[0]
+            parent2 = self._select_tournament_population(pop).get_schedules()[0]
+            child = self._crossover_schedule(parent1, parent2)
+            crossover_pop.get_schedules().append(child)
+
+        return crossover_pop
+
+    def _mutate_population(self, pop):
+        for i in range(NUMB_OF_ELITE_SCHEDULES, POPULATION_SIZE):
+            if rnd.random() < MUTATION_RATE:
+                pop.get_schedules()[i].initialize()
+        return pop
+
+    def _crossover_schedule(self, s1, s2):
+        child = Schedule()
+        for i in range(len(s1.get_classes())):
+            if rnd.random() > 0.5:
+                child.get_classes()[i] = s1.get_classes()[i]
+            else:
+                child.get_classes()[i] = s2.get_classes()[i]
+        return child
+
+    def _select_tournament_population(self, pop):
+        tournament = Population(0)
+        for _ in range(TOURNAMENT_SELECTION_SIZE):
+            tournament.get_schedules().append(rnd.choice(pop.get_schedules()))
+        tournament.get_schedules().sort(key=lambda x: x.get_fitness(), reverse=True)
+        return tournament
+
+# ---------- Context Manager for Rendering ----------
 def context_manager(schedule):
     classes = schedule.get_classes()
     context = []
+
     for c in classes:
         context.append({
             "level": c.level.name,
@@ -85,7 +153,7 @@ def context_manager(schedule):
         })
     return context
 
-
+# ---------- Main Timetable View ----------
 def timetable(request):
     population = Population(POPULATION_SIZE)
     generation_num = 0
@@ -99,7 +167,7 @@ def timetable(request):
 
     best_schedule = population.get_schedules()[0]
 
-    # Clear previous sessions if needed
+    # Clear old schedule
     Session.objects.all().delete()
 
     # Save new schedule
@@ -112,7 +180,8 @@ def timetable(request):
             level=c.level
         )
 
-    return render(request, 'gentimetable.html', {
+    # Render to template
+    return render(request, 'timetable.html', {
         'schedule': context_manager(best_schedule),
         'levels': Level.objects.all(),
         'times': MeetingTime.objects.all(),
