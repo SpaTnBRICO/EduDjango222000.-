@@ -17,6 +17,9 @@ import base64
 from django.http import JsonResponse
 import requests
 
+#Search stuff 
+from django.db.models import Q
+
 from .genrateAcesstoken import get_access_token
 from .stkPush import initiate_stk_push
 from .query import query_stk_status
@@ -939,18 +942,21 @@ def add_unit(request, id):
         return redirect('home')
     # Get all courses to populate the select box in the form
     cos = Course.objects.get(id=id)
+    levels = Level.objects.filter(course=cos)
     if request.method == "POST":
         # Get form data
         title = request.POST.get('title')
         course_id = request.POST.get('department')
+        level_id = request.POST.get('level')
 
         # Check if the required fields are provided
-        if not course_id:
+        if not course_id and level_id:
             messages.error(request, "Please select a course.")
             return redirect(f'/add_unit/<int:{cos}>/')
 
         try:
             course = Course.objects.get(id=course_id)  # Get the COURSE by ID
+            level = Level.objects.get(id=level_id)
         except Course.DoesNotExist:
             messages.error(request, "Invalid course selected.")
             return redirect(f'/add_unit/<int:{cos}>/')
@@ -959,6 +965,7 @@ def add_unit(request, id):
         unit = Unit(
             name=title,
             course=course,
+            level=level,
             teacher=request.user,
             created_by=request.user
         )
@@ -973,6 +980,7 @@ def add_unit(request, id):
     # Render the form with departments for GET request
     return render(request, "logs/add_unit.html", {
         'cos': cos,
+        'levels': levels,
     })
 
 
@@ -1211,10 +1219,10 @@ def fee_payment_view(request):
         mode_of_payment = request.POST.get('mode_of_payment')
         phone_number = request.POST.get('phone')
 
-        if amount:
+        if aamount:
             try:
                 # Convert the amount to a Decimal
-                amount = Decimal(amount)
+                aamount = Decimal(aamount)
 
                 # Create a new FeePayment record
                 payment = FeePayment(
@@ -1837,6 +1845,68 @@ def cat_list_view(request):
         cats = CAT.objects.filter(created_by=request.user.username).order_by('-id')
     return render(request, 'logs/cat_add_form.html', {'cats': cats})
 
+@login_required
+def cat_marks_form_edit(request, cat_id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to view this page.")
+        return redirect('home')
+    cat = CAT.objects.get(id=cat_id)
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        unit_id = request.POST.get('unit')
+        course_id = request.POST.get('course')
+
+        att = request.FILES.get('att')
+        mark = request.FILES.get('mark')
+        pc_waiting = request.FILES.get('pc_waiting')
+
+        errors = []
+
+        if not title:
+            errors.append("Title is required.")
+        
+        if att and not is_pdf(att):
+            errors.append("Test Attendance file must be a PDF.")
+        if mark and not is_pdf(mark):
+            errors.append("Mark Sheet file must be a PDF.")
+        if pc_waiting and not is_pdf(pc_waiting):
+            errors.append("PC Waiting List file must be a PDF.")
+
+        if errors:
+            for error in errors:
+                messages.warning(request, error)
+        else:
+            unit = get_object_or_404(Unit, id=cat.unit.id)
+
+            # Save optional files only if provided
+            if title:
+                cat.title = title
+            if unit:
+                cat.unit = unit
+            if att:
+                cat.attendance_sheet = att
+            if mark:
+                cat.mark_sheet = mark
+            if pc_waiting:
+                cat.pc_waiting = pc_waiting
+
+            cat.save()
+            messages.success(request, "CAT updated successfully.")
+            return redirect('/cat_list/')
+    
+    return render(request, 'logs/cat_marks_form_edit.html', {'cat': cat})
+
+@login_required
+def cat_marks_form_delete(request, cat_id):
+    if not (request.user.is_admin or request.user.is_teacher):
+        messages.error(request, "You don't have permission to perform this action.")
+        return redirect('home')
+    cat = CAT.objects.get(id=cat_id)
+    cat.delete()
+    messages.success(request, f"CAT {cat.title} deleted successfully.")
+    return redirect('/cat_list/')
+
+
 
 
 @login_required
@@ -1844,15 +1914,19 @@ def marks_view(request):
     if not request.user.is_student:
         messages.error(request, "You don't have permission to view this page.")
         return redirect('home')
+
     # Get the logged-in user's StudentApp
     student_app = get_object_or_404(StudentApp, registration_number=request.user.username)
 
-    # Get the student's CAT scores
-    cat_scores = CATScore.objects.filter(student=student_app).select_related('cat__unit__course').order_by('-id')
+    # Filter CATScores for only approved CATs
+    cat_scores = CATScore.objects.filter(
+        student=student_app,
+        cat__is_approved=True  # ✅ Only include approved CATs
+    ).select_related('cat__unit__course').order_by('-id')
 
     # Group CAT scores by course name
     grouped_scores = {}
-    for score in cat_scores.cat.is_approved:
+    for score in cat_scores:
         course_name = score.cat.unit.course.name
         grouped_scores.setdefault(course_name, []).append(score)
 
@@ -1902,3 +1976,47 @@ def timetable_view(request, level_id):
 ::contentReference[oaicite:0]{index=0}
 
 """
+
+def course_list(request):
+    courses = Course.objects.all()
+    return render(request, 'logs/course_list.html', {'courses': courses})
+
+def level_list(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    levels = Level.objects.filter(course=course)
+    return render(request, 'logs/level_list.html', {'course': course, 'levels': levels})
+
+def cat_list(request, course_id, level_id):
+    level = get_object_or_404(Level, pk=level_id)
+    units = Unit.objects.filter(course_id=course_id, level=level)
+    cats = CAT.objects.filter(unit__in=units, is_approved=True)
+    return render(request, 'logs/cat_list.html', {'cats': cats, 'level': level})
+
+
+
+def cat_scores(request, cat_id):
+    cat = get_object_or_404(CAT, pk=cat_id)
+    query = request.GET.get('q', '')
+
+    scores = CATScore.objects.filter(cat=cat).select_related('student')
+
+    if query:
+        scores = scores.filter(
+            Q(student__first_name__icontains=query) |
+            Q(student__last_name__icontains=query) |
+            Q(student__registration_number__icontains=query)
+        )
+
+    return render(request, 'logs/cat_scores.html', {
+        'cat': cat,
+        'scores': scores,
+        'query': query,
+    })
+
+    
+def student_catscores(request, catsc_id):
+    score = get_object_or_404(CATScore, pk=catsc_id)
+    
+    return render(request, 'logs/student_catscores.html', {
+        'score': score,
+    })

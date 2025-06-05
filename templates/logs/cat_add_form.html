@@ -17,6 +17,7 @@
             {% endif %}
           <div class="card-header">
             <h4>Existing CATs</h4>
+            <a href="{% url 'course_list' %}" class="btn btn-primary btn-sm ml-auto">View each student submitted cat marks</a>
             <a href="{% url 'create_cat' %}" class="btn btn-primary btn-sm ml-auto">+ New CAT</a>
           </div>
           <div class="card-body">
@@ -39,6 +40,8 @@
                       <th>Actions</th>
                       {% endif %}
                       <th>View/Enter</th>
+                      <th>Edit</th>
+                      <th>Del</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -74,6 +77,12 @@
                         {% endif %}
                         <td>
                           <a href="{% url 'marks_entry' cat.id %}" class="btn btn-sm btn-info">Enter Marks/View</a>
+                        </td>
+                        <td>
+                          <a href="{% url 'cat_marks_form_edit' cat.id %}" class="btn btn-sm btn-info">Edit</a>
+                        </td>
+                        <td>
+                          <a href="{% url 'cat_marks_form_delete' cat.id %}" class="btn btn-sm btn-danger">Delete</a>
                         </td>
                       </tr>
                     {% endfor %}

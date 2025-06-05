@@ -13,7 +13,7 @@ import pyotp
 from datetime import datetime
 from django.template.loader import render_to_string  # <-- Add this import here
 from .models import CustomerUser, Student, UserProfile, Course, StudentApp, Teacher, Department, Level
-from loging.models import Contact
+from loging.models import Contact, FeePayment
 from django.core.exceptions import ObjectDoesNotExist
 
 from .forms import UserUpdateForm, UserProfileUpdateForm
@@ -317,6 +317,7 @@ def admin_dashboard(request):
         courses = Course.objects.count()
         total_users = CustomerUser.objects.count()
         departments = Department.objects.count()
+        fees = FeePayment.objects.all()
     return render(request, "admins.html", {
         'total_students':total_students,
         'inst':inst,
@@ -324,6 +325,7 @@ def admin_dashboard(request):
         'total_users':total_users,
         'departments':departments,
         'messages':messages,
+        'fees':fees,
         })
 
 # Staff Dashboard - Accessible only by staff users
@@ -1016,12 +1018,15 @@ def get_levels_by_course(request, course_id):
 def apply_for_cos(request):
     if request.method == 'POST':
         # Extract data from the form
-        student_id = request.POST['student_id']
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
-        email = request.POST['email']
-        phone_number = request.POST['phone_number']
-        course_id = request.POST['course_id']
+        student_id = request.POST.get('student_id')
+        first_name = request.POST.get('first_name')
+        last_name = request.POST.get('last_name')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone_number')
+        course_id = request.POST.get('course_id')
+        level_id = request.POST.get('level_id')
+
+        print(f"this the level id {level_id}")
 
 
         if StudentApp.objects.filter(student_id=student_id).exists():
@@ -1038,6 +1043,17 @@ def apply_for_cos(request):
 
         # Get the course based on the selected course ID
         course = Course.objects.get(id=course_id)
+
+
+        if not level_id:
+             messages.warning(request, "You must select a level.")
+             return redirect('/auth_access/apply/')
+
+        try:
+            level = Level.objects.get(id=int(level_id))
+        except (ValueError, Level.DoesNotExist):
+            messages.warning(request, "Invalid level selected.")
+            return redirect('/auth_access/apply/')
         
         # Create a StudentApplication object with the form data
         application = StudentApp(
@@ -1046,6 +1062,7 @@ def apply_for_cos(request):
             last_name=last_name,
             email=email,
             course=course,
+            level=level,
             phone_number=phone_number
         )
         application.save()  # This triggers the generation of the registration number
@@ -1058,7 +1075,10 @@ def apply_for_cos(request):
     # Retrieve all available courses to show in the form
     courses = Course.objects.all()
     user_profile = get_object_or_404(UserProfile, user=request.user)
-    return render(request, 'apply_for_course.html', {'courses': courses, 'user_profile':user_profile})
+    return render(request, 'apply_for_course.html', {
+        'courses': courses,
+        'user_profile':user_profile,
+        })
 
 @login_required
 def add_teacher(request):

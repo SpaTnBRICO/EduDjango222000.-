@@ -16,3 +16,7 @@ admin.site.register(Practical)
 admin.site.register(CATScore)
 admin.site.register(PRACScore)
 admin.site.register(Level)
+admin.site.register(Room)
+admin.site.register(Session)
+admin.site.register(MeetingTime)
+

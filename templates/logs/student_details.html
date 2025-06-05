@@ -19,6 +19,7 @@
                   <div class="section-title">Academic</div>
                   <ul>
                     <li><strong>Course:</strong> {{ student.course.name }}</li>
+                    <li><strong>Course:</strong> {{ student.level.name }}</li>
                     <li><strong>Approval Status:</strong> {% if student.is_approved %} Approved {% else %} Not Approved {% endif %}</li>
                     <li><strong>Application Year:</strong> {{ student.application_year }}</li>
                     <li><strong>Registration Number:</strong> {{ student.registration_number }}</li>

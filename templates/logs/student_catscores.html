@@ -1,0 +1,86 @@
+{% extends '../baseadmin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+  <div class="section-body">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h4>Results</h4>
+            <span class="text-muted">Student: {{ score.student.first_name }} {{ score.student.last_name }}</span>
+          </div>
+          <div class="card-body">
+
+            
+              <h5 class="text-primary mt-5">{{ score.cat.unit.course }} {{ score.cat.unit.level.name }}</h5>
+
+              
+
+              
+              <div class="card mb-3 border-left-shadow-sm">
+                <div class="card-body">
+                  <h5 class="card-title mb-2">Department: {{ score.cat.unit.course.department.name }}</h5>
+                  <h5 class="card-title mb-2">Course: {{ score.cat.unit.course.name }} {{ score.cat.unit.level.name }}
+                  </h5>
+                  <h5 class="card-title mb-2">Unit: {{ score.cat.unit.name }}</h5>
+                  <h6 class="card-title mb-2">{{ score.cat.title }}</h6>
+                  <p class="mb-1">
+                    <strong>Score:</strong>
+                    {% if score.score %}
+                      {{ score.score }}
+                    {% else %}
+                      <span class="text-muted">Not yet entered</span>
+                    {% endif %}
+                  </p>
+                  <p class="mb-1">
+                    <strong>Examsheet:</strong>
+                    {% if score.attachment %}
+                      <a href="{{ score.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                    {% else %}
+                      <span class="text-muted">No file uploaded</span>
+                    {% endif %}
+                  </p>
+                  <p class="mb-1">
+                    <strong>Marksheet:</strong>
+                    {% if score.cat.mark_sheet %}
+                      <a href="{{ score.cat.mark_sheet.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                    {% else %}
+                      <span class="text-muted">No file uploaded</span>
+                    {% endif %}
+                  </p>
+                  <p class="mb-1">
+                    <strong>Attendance:</strong>
+                    {% if score.cat.attendance_sheet %}
+                      <a href="{{ score.cat.attendance_sheet.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                    {% else %}
+                      <span class="text-muted">No file uploaded</span>
+                    {% endif %}
+                  </p>
+                  <p class="mb-1">
+                    <strong>PC Waiting:</strong>
+                    {% if score.cat.pc_waiting %}
+                      <a href="{{ score.cat.pc_waiting.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                    {% else %}
+                      <span class="text-muted">No file uploaded</span>
+                    {% endif %}
+                  </p>
+                  <p class="text-muted mb-0">
+                    <small>Recorded on: {{ score.created_at|date:"M d, Y H:i" }}</small>
+                  </p>
+                </div>
+              </div>
+                        
+
+            <div class="alert alert-info mt-4">
+              End of CAT records.
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}

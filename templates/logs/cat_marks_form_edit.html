@@ -1,0 +1,144 @@
+{% extends '../baseadmin.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section mt-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="card shadow-sm border-0">
+          <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">📘 Edit CAT >>>> Title:{{cat.title}}</h4>
+          </div>
+          <div class="card-body">
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data" action="{% url 'cat_marks_form_edit' cat.id %}" novalidate>
+              {% csrf_token %}
+
+              <!-- CAT Title -->
+              <div class="form-group mb-3">
+                <label for="title">CAT Title</label>
+                <input 
+                  type="text" 
+                  name="title" 
+                  id="title" 
+                  class="form-control" 
+                  placeholder="e.g. CAT 1" 
+                  value="{{ cat.title }}" 
+                  required>
+                <small class="form-text text-muted">Enter a clear and descriptive CAT title.</small>
+                <div class="invalid-feedback">Please provide a CAT title.</div>
+              </div>
+
+              <!-- Test Attendance -->
+              <div class="form-group mb-3">
+                <label for="att">Test Attendance</label>
+                <input type="file" name="att" accept="application/pdf" class="form-control-file">
+                <small class="form-text text-muted">Only PDF files are allowed.</small>
+                {% if cat.attendance_sheet %}
+                <small class="form-text text-success">{{cat.attendance_sheet.url}} is uploaded</small>
+                {% else %}
+                <small class="form-text text-danger">No file uploaded</small>
+                {% endif %}
+              </div>
+
+              <!-- Mark Sheet -->
+              <div class="form-group mb-3">
+                <label for="mark">Mark Sheet</label>
+                <input type="file" name="mark" accept="application/pdf" class="form-control-file">
+                <small class="form-text text-muted">Only PDF files are allowed.</small>
+                {% if cat.mark_sheet %}
+                <small class="form-text text-success">{{cat.mark_sheet.url}} is uploaded</small>
+                {% else %}
+                <small class="form-text text-danger">No file uploaded</small>
+                {% endif %}
+              </div>
+
+              <!-- PC Waiting List -->
+              <div class="form-group mb-3">
+                <label for="pc_waiting">PC Waiting List</label>
+                <input type="file" name="pc_waiting" accept="application/pdf" class="form-control-file">
+                <small class="form-text text-muted">Only PDF files are allowed.</small>
+                {% if cat.pc_waiting %}
+                <small class="form-text text-success">{{cat.pc_waiting}} is uploaded</small>
+                {% else %}
+                <small class="form-text text-danger">No file uploaded</small>
+                {% endif %}
+              </div>
+
+              <!-- Course Select -->
+              <div class="form-group mb-3">
+                <label for="course">Course</label><br>
+                <small class="form-text text-muted">current course>>> {{cat.unit.course.name}}</small>
+                <select name="course" id="course" class="form-control" required>
+                  <option value="">-- Select Course --</option>
+                  {% for course in courses %}
+                    <option value="{{ course.id }}"
+                      {% if request.POST.course == course.id|stringformat:"s" %}selected{% endif %}>
+                      {{ course.name }}
+                    </option>
+                  {% endfor %}
+                  
+                </select>
+                <div class="invalid-feedback">Please select a course.</div>
+              </div>
+
+              <!-- Unit Select -->
+              <div class="form-group mb-4">
+                <label for="unit">Unit</label><br>
+                <small class="form-text text-muted">current unit>>> {{cat.unit.name}}</small>
+                <select name="unit" id="unit" class="form-control" required>
+                  <option value="">-- Select Unit --</option>
+                </select>
+                <div class="invalid-feedback">Please select a unit.</div>
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" class="btn btn-success w-100">
+                <i class="fas fa-plus-circle"></i> Update CAT
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- jQuery & Bootstrap JS (if not already included) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $('#course').on('change', function () {
+    const courseId = $(this).val();
+    const unitSelect = $('#unit');
+
+    unitSelect.empty().append('<option value="">-- Loading units... --</option>');
+
+    if (courseId) {
+      $.ajax({
+        url: "{% url 'get_units_by_course' %}",
+        data: { course_id: courseId },
+        success: function (data) {
+          unitSelect.empty().append('<option value="">-- Select Unit --</option>');
+          data.forEach(unit => {
+            unitSelect.append(`<option value="${unit.id}">${unit.name}</option>`);
+          });
+        },
+        error: function () {
+          unitSelect.empty().append('<option value="">Error loading units</option>');
+        }
+      });
+    } else {
+      unitSelect.empty().append('<option value="">-- Select Unit --</option>');
+    }
+  });
+</script>
+{% endblock content %}

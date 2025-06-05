@@ -284,33 +284,8 @@
                       </tr>
                       {% empty %}
                       <tr>
-                        <td>Create a mobile app</td>
-                        <td class="text-truncate">
-                          <ul class="list-unstyled order-list m-b-0 m-b-0">
-                            <li class="team-member team-member-sm"><img class="rounded-circle"
-                                src="{% static 'dash/img/users/user-8.png' %}" alt="user" data-toggle="tooltip" title=""
-                                data-original-title="Wildan Ahdian"></li>
-                            <li class="team-member team-member-sm"><img class="rounded-circle"
-                                src="{% static 'dash/img/users/user-9.png' %}" alt="user" data-toggle="tooltip" title=""
-                                data-original-title="John Deo"></li>
-                            <li class="team-member team-member-sm"><img class="rounded-circle"
-                                src="{% static 'dash/img/users/user-10.png' %}" alt="user" data-toggle="tooltip" title=""
-                                data-original-title="Sarah Smith"></li>
-                            <li class="avatar avatar-sm"><span class="badge badge-primary">+4</span></li>
-                          </ul>
-                        </td>
-                        <td class="align-middle">
-                          <div class="progress-text">50%</div>
-                          <div class="progress" data-height="6">
-                            <div class="progress-bar bg-success" data-width="50%"></div>
-                          </div>
-                        </td>
-                        <td>2018-01-20</td>
-                        <td>2019-05-28</td>
-                        <td>
-                          <div class="badge badge-success">Low</div>
-                        </td>
-                        <td><a href="#" class="btn btn-outline-primary">Detail</a></td>
+                        <td>No New Messages</td>
+                        
                       </tr>
                       {% endfor %}
                     </table>
@@ -386,7 +361,7 @@
             <div class="col-md-6 col-lg-12 col-xl-6">
               <div class="card">
                 <div class="card-header">
-                  <h4>Projects Payments</h4>
+                  <h4>Fee Payments</h4>
                 </div>
                 <div class="card-body">
                   <div class="table-responsive">
@@ -394,73 +369,31 @@
                       <thead>
                         <tr>
                           <th>#</th>
-                          <th>Client Name</th>
+                          <th>Registration Number</th>
+                          <th>Student Name</th>
                           <th>Date</th>
                           <th>Payment Method</th>
                           <th>Amount</th>
                         </tr>
                       </thead>
                       <tbody>
+                        {% if fees %}
+                        {% for fee in fees %}
                         <tr>
-                          <td>1</td>
-                          <td>John Doe </td>
-                          <td>11-08-2018</td>
-                          <td>NEFT</td>
-                          <td>$258</td>
+                          <td>{{ forloop.counter }}</td>
+                          <td>{{fee.student.registration_number}}</td>
+                          <td>{{fee.student.first_name}} {{fee.student.last_name}}</td>
+                          <td>{{fee.payment_date}}</td>
+                          <td>{{fee.mode_of_payment}}</td>
+                          <td>${{fee.amount}}</td>
                         </tr>
+                        {% endfor %}
+                        {% else %}
                         <tr>
-                          <td>2</td>
-                          <td>Cara Stevens
-                          </td>
-                          <td>15-07-2018</td>
-                          <td>PayPal</td>
-                          <td>$125</td>
+                          <td>No feepayments made </td>
+                          
                         </tr>
-                        <tr>
-                          <td>3</td>
-                          <td>
-                            Airi Satou
-                          </td>
-                          <td>25-08-2018</td>
-                          <td>RTGS</td>
-                          <td>$287</td>
-                        </tr>
-                        <tr>
-                          <td>4</td>
-                          <td>
-                            Angelica Ramos
-                          </td>
-                          <td>01-05-2018</td>
-                          <td>CASH</td>
-                          <td>$170</td>
-                        </tr>
-                        <tr>
-                          <td>5</td>
-                          <td>
-                            Ashton Cox
-                          </td>
-                          <td>18-04-2018</td>
-                          <td>NEFT</td>
-                          <td>$970</td>
-                        </tr>
-                        <tr>
-                          <td>6</td>
-                          <td>
-                            John Deo
-                          </td>
-                          <td>22-11-2018</td>
-                          <td>PayPal</td>
-                          <td>$854</td>
-                        </tr>
-                        <tr>
-                          <td>7</td>
-                          <td>
-                            Hasan Basri
-                          </td>
-                          <td>07-09-2018</td>
-                          <td>Cash</td>
-                          <td>$128</td>
-                        </tr>
+                        {% endif %}
                       </tbody>
                     </table>
                   </div>

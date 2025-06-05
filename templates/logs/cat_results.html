@@ -16,6 +16,8 @@
             {% for course_name, scores in grouped_scores.items %}
               <h5 class="text-primary mt-5">{{ course_name }}</h5>
 
+              
+
               {% for score in scores %}
               <div class="card mb-3 border-left-{{ forloop.counter|divisibleby:"3"|yesno:"primary,success,info" }} shadow-sm">
                 <div class="card-body">
@@ -30,13 +32,36 @@
                     {% endif %}
                   </p>
                   <p class="mb-1">
-                    <strong>Attachment:</strong>
+                    <strong>Marked ExamSheet:</strong>
                     {% if score.attachment %}
                       <a href="{{ score.attachment.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
                     {% else %}
                       <span class="text-muted">No file uploaded</span>
                     {% endif %}
-                  </p>
+                    <p class="mb-1">
+                      <strong>Marksheet:</strong>
+                      {% if score.cat.mark_sheet %}
+                        <a href="{{ score.cat.mark_sheet.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                      {% else %}
+                        <span class="text-muted">No file uploaded</span>
+                      {% endif %}
+                    </p>
+                    <p class="mb-1">
+                      <strong>Attendance:</strong>
+                      {% if score.cat.attendance_sheet %}
+                        <a href="{{ score.cat.attendance_sheet.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                      {% else %}
+                        <span class="text-muted">No file uploaded</span>
+                      {% endif %}
+                    </p>
+                    <p class="mb-1">
+                      <strong>PC Waiting:</strong>
+                      {% if score.cat.pc_waiting %}
+                        <a href="{{ score.cat.pc_waiting.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">View PDF</a>
+                      {% else %}
+                        <span class="text-muted">No file uploaded</span>
+                      {% endif %}
+                    </p>
                   <p class="text-muted mb-0">
                     <small>Recorded on: {{ score.created_at|date:"M d, Y H:i" }}</small>
                   </p>
@@ -44,6 +69,7 @@
               </div>
               {% endfor %}
             {% endfor %}
+            
 
             <div class="alert alert-info mt-4">
               End of CAT records.

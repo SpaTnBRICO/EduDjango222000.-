@@ -325,7 +325,7 @@ class Course(models.Model):
         return self.name
 
 class Level(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='levels')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_levels')
     name = models.CharField(max_length=15, blank=True, null=True)
     modified_at = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -378,7 +378,7 @@ class Session(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.unit.name} | {self.instructor.name} | {self.level.name} | {self.meeting_time}"
+        return f"{self.unit.name} | {self.instructor.first_name} | {self.level.name} | {self.meeting_time}"
 
     class Meta:
         unique_together = (
@@ -405,7 +405,7 @@ class StudentApp(models.Model):
     total_fees = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), editable=False)
     remaining_balance = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='students')
-    level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='levels', null=True, blank=True)
+    level = models.ForeignKey(Level, on_delete=models.CASCADE, related_name='levels')
     application_year = models.IntegerField(default=timezone.now().year, editable=False)
     registration_number = models.CharField(max_length=50, blank=True, null=True, editable=False, unique=True)
     created_at = models.DateTimeField(auto_now_add=True, editable=False)
@@ -426,6 +426,8 @@ class StudentApp(models.Model):
         self.registration_number = reg_num
 
     def save(self, *args, **kwargs):
+        if not self.level:
+            self.level = self.course.course_levels.first()
         if not self.registration_number:
             self.generate_registration_number()
 

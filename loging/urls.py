@@ -76,9 +76,18 @@ urlpatterns = [
     path('create_cat/', views.create_cat, name="create_cat"),
     path('ajax/get-units/', views.get_units_by_course, name='get_units_by_course'),
     path('cat_list/', views.cat_list_view, name="cat_list_view"),
+    path('edit_cat_details/<int:cat_id>/', views.cat_marks_form_edit, name="cat_marks_form_edit"),
+    path('delete_cat_form/<int:cat_id>/', views.cat_marks_form_delete, name="cat_marks_form_delete"),
     path('cat_results/', views.marks_view, name="marks_view"),
     path('cat_approval/<int:cat_id>/', views.cat_approval, name="cat_approval"),
     path('cat_submission/<int:cat_id>/', views.cat_submission, name="cat_submission"),
+
+    path('coursess/', views.course_list, name='course_list'),
+    path('coursess/<int:course_id>/levels/', views.level_list, name='level_list'),
+    path('coursess/<int:course_id>/levels/<int:level_id>/cats/', views.cat_list, name='cat_list'),
+    path('cats/<int:cat_id>/scores/', views.cat_scores, name='cat_scores'),
+    path('students/<int:catsc_id>/catscores/', views.student_catscores, name='student_catscores'),
+
 
     # Edit quiz URL
     path('quiz/edit/<int:quiz_id>/', views.edit_quiz, name='edit_quiz'),
